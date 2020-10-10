@@ -159,9 +159,8 @@ class NPC(Character, GameObject):
 
         '''
         Shape creation
-        shape?
+        shape TODO
         vision (_vision) depends on PERC aptitude => how to visualize?
-
         speed (_dx, _dy) depends on MOVE aptitude
         size (_size) depends on CONST aptitude
         color (r,g,b) depends on psychical aptitudes (INTL, CHAR, ETHQ)
