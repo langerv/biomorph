@@ -1,3 +1,4 @@
+import abc
 import arcade
 import timeit
 import random
@@ -22,8 +23,10 @@ HIT_TIMER = 5 # number of seconds before a hit npc goes back to life
 MIN_SHAPE_SIZE = 20
 RAD2DEG = 180 / math.pi
 
-
-class GameObject():
+'''
+GameObject class
+'''
+class GameObject(abc.ABC):
 
     def __init__(self, x, y):
         self._angle = 0
@@ -31,8 +34,6 @@ class GameObject():
         self._dy = 0
         self._size = MIN_SHAPE_SIZE
         self._shape = None
-        self._hit = False
-        self._hit_time = 0
 
     @property
     def X(self):
@@ -46,14 +47,7 @@ class GameObject():
     def Size(self):
         return self._size
 
-    @property
-    def Hit(self):
-        return self._hit
-
-    @Hit.setter
-    def Hit(self, value):
-        self._hit = value
-
+    @abc.abstractmethod
     def update(self, delta_time):
         pass
 
@@ -61,6 +55,9 @@ class GameObject():
         self._shape.draw()
 
 
+'''
+Player class
+'''
 class Player(Biomorph, GameObject):
 
     def __init__(self, x, y):
@@ -114,26 +111,29 @@ class Player(Biomorph, GameObject):
                 self._goal = None
 
 
+'''
+NPC class
+
+Shape creation
+shape TODO
+vision (_vision) depends on PERC aptitude => how to visualize?
+speed (_dx, _dy) depends on MOVE aptitude
+size (_size) depends on CONST aptitude
+color (r,g,b) depends on psychical aptitudes (INTL, CHAR, ETHQ)
+'''
 class NPC(Character, GameObject):
 
     def __init__(self, x, y):
         Character.__init__(self)
         GameObject.__init__(self, x, y)
+        self._hit = False
+        self._hit_time = 0
         self.set_aptitude(PhysicalAptitudes.PERC, random.randrange(1,6))
         self.set_aptitude(PhysicalAptitudes.MOVE, random.randrange(1,6))
         self.set_aptitude(PhysicalAptitudes.CONS, random.randrange(1,6))
         self.set_aptitude(PsychicalAptitudes.INTL, random.randrange(1,6))
         self.set_aptitude(PsychicalAptitudes.CHAR, random.randrange(1,6))
         self.set_aptitude(PsychicalAptitudes.ETHQ, random.randrange(1,6))
-
-        '''
-        Shape creation
-        shape TODO
-        vision (_vision) depends on PERC aptitude => how to visualize?
-        speed (_dx, _dy) depends on MOVE aptitude
-        size (_size) depends on CONST aptitude
-        color (r,g,b) depends on psychical aptitudes (INTL, CHAR, ETHQ)
-        '''
         self._dx = self._dy = self.get_aptitude(PhysicalAptitudes.MOVE).Value
         self._size += self.get_aptitude(PhysicalAptitudes.CONS).Value**2
         r = int(self.get_aptitude(PsychicalAptitudes.INTL).Value * 255/5)
@@ -143,6 +143,14 @@ class NPC(Character, GameObject):
 
     def __str__(self):
         return '    '.join([f"{key.name} = {ap.Value}" for key, ap in self.Aptitudes.items()])
+
+    @property
+    def Hit(self):
+        return self._hit
+
+    @Hit.setter
+    def Hit(self, value):
+        self._hit = value
 
     def update(self, delta_time):
         if self._hit is True:
@@ -170,11 +178,13 @@ class NPC(Character, GameObject):
                 self._dy *= -1
 
 
+'''
+GameView class: main gameplay screen
+'''
 class GameView(arcade.View):
     """ Our custom Window Class"""
 
     def __init__(self):
-        """ Initializer """
         super().__init__()
         self._perf = False
         self._processing_time = 0
@@ -185,10 +195,8 @@ class GameView(arcade.View):
         self._total_time = 0.0        
         self._npcs = None
         self._neighbours = []
-#        arcade.set_background_color(arcade.color.ARSENIC)
 
     def setup(self):
-        """ Set up the game and initialize the variables. """
         x = SCREEN_WIDTH/2 #random.randrange(50, SCREEN_WIDTH-50)
         y = SCREEN_HEIGHT/2 #random.randrange(50, SCREEN_HEIGHT-50)
         self._player = Player(x, y)
@@ -199,9 +207,7 @@ class GameView(arcade.View):
             self._npcs.append(NPC(x, y))
 
     def on_draw(self):
-        """ Draw everything """
-        # Start timing how long this takes
-
+        # Start timing how long this takes and count frames
         draw_start_time = timeit.default_timer()
         if self._frame_count % 60 == 0:
             if self._fps_start_timer is not None:
@@ -225,9 +231,9 @@ class GameView(arcade.View):
                 3))
         line_list.draw()
 
+        # render NPCs and Player
         for npc in self._npcs:
             npc.draw()
-
         self._player.draw()
 
         # display game infos
@@ -266,12 +272,10 @@ class GameView(arcade.View):
                 half_size = npc.Size/2
                 if x >= (npc.X - half_size) and x <= (npc.X + half_size) and y >= (npc.Y - half_size) and y <= (npc.Y + half_size):
                     npc.Hit = True
-                    
-            # nope them move player
+            # move player
             self._player.Goal = (x, y)
 
     def on_update(self, delta_time):
-        """ Movement and game logic """
         start_time = timeit.default_timer()
         self._player.update(delta_time)
         self._neighbours = []
@@ -286,7 +290,9 @@ class GameView(arcade.View):
         self._total_time += delta_time
         self._processing_time = timeit.default_timer() - start_time
 
-
+'''
+main function: initialize and start the game screens
+'''
 def main():
     window = arcade.Window(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
     start_view = GameView()
