@@ -2,6 +2,7 @@ import arcade
 import timeit
 import random
 import math
+from shape import Rectangle, Ellipse
 from biomorph import Biomorph
 from character import Character
 from aptitude import PhysicalAptitudes, PsychicalAptitudes
@@ -20,49 +21,6 @@ NUM_NPC = 30
 HIT_TIMER = 5 # number of seconds before a hit npc goes back to life
 MIN_SHAPE_SIZE = 20
 RAD2DEG = 180 / math.pi
-
-
-class Shape():
-    def __init__(self, x, y, angle, width, height, color):
-        self._x = x
-        self._y = y
-        self._angle = angle
-        self._width = width
-        self._height = height
-        self._color = color
-        self._shape_list = None
-
-    def draw(self):
-        self._shape_list.center_x = self._x
-        self._shape_list.center_y = self._y
-        self._shape_list.angle = self._angle
-        self._shape_list.draw()
-
-class Rectangle(Shape):
-    def __init__(self, x, y, angle, width, height, color):
-        super().__init__(x, y, angle, width, height, color)
-        shape = arcade.create_rectangle_filled(
-            0, 0, 
-            self._width, 
-            self._height, 
-            self._color, 
-            self._angle)
-        self._shape_list = arcade.ShapeElementList()
-        self._shape_list.append(shape)
-
-
-class Ellipse(Shape):
-    def __init__(self, x, y, angle, width, height, color):
-        super().__init__(x, y, angle, width, height, color)
-        shape = arcade.create_ellipse_filled(
-            0, 0, 
-            self._width, 
-            self._height, 
-            self._color, 
-            self._angle)
-        self._shape_list = arcade.ShapeElementList()
-        self._shape_list.append(shape)
-
 
 class GameObject():
 
@@ -178,11 +136,13 @@ class NPC(Character, GameObject):
 
     def move(self, delta_time):
         if self._hit is True:
+            # if a npc is hit, we compute time before to get it back to life
             self._hit_time += delta_time
             if int(self._hit_time) % 60 > HIT_TIMER:
                 self._hit_time = 0
                 self._hit = False
         else:
+            # move
             self._shape._x += self._dx
             self._shape._y += self._dy
             self._shape._angle = math.atan2(self._dy, self._dx) * RAD2DEG
