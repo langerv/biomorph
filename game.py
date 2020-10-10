@@ -9,7 +9,7 @@ from aptitude import PhysicalAptitudes, PsychicalAptitudes
 # --- Constants ---
 SCREEN_WIDTH =  800
 SCREEN_HEIGHT = 600
-SCREEN_TITLE = "Biomorph game!"
+SCREEN_TITLE = "Biomorph game"
 WORLD_WIDTH =  2 * SCREEN_WIDTH
 WORLD_HEIGHT = 2 * SCREEN_HEIGHT
 WORLD_XMIN =  SCREEN_WIDTH/2 - WORLD_WIDTH/2
