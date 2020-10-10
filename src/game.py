@@ -17,6 +17,10 @@ WORLD_XMAX =  SCREEN_WIDTH/2 + WORLD_WIDTH/2
 WORLD_YMIN =  SCREEN_HEIGHT/2 - WORLD_HEIGHT/2
 WORLD_YMAX =  SCREEN_HEIGHT/2 + WORLD_HEIGHT/2
 NUM_NPC = 30
+HIT_TIMER = 5 # number of seconds before a hit npc goes back to life
+MIN_SHAPE_SIZE = 20
+RAD2DEG = 180 / math.pi
+
 
 class Shape():
     def __init__(self, x, y, angle, width, height, color):
@@ -62,16 +66,14 @@ class Ellipse(Shape):
 
 class GameObject():
 
-    MIN_SHAPE_SIZE = 20
-    RAD2DEG = 180 / math.pi
-
     def __init__(self, x, y):
         self._angle = 0
         self._dx = 0
         self._dy = 0
-        self._size = GameObject.MIN_SHAPE_SIZE
+        self._size = MIN_SHAPE_SIZE
         self._shape = None
         self._hit = False
+        self._hit_time = 0
 
     @property
     def X(self):
@@ -81,26 +83,20 @@ class GameObject():
     def Y(self):
         return self._shape._y
 
-    def hit(self):
-        self._hit = True
+    @property
+    def Size(self):
+        return self._size
 
-    def move(self):
-        if self._hit is False:
-            self._shape._x += self._dx
-            self._shape._y += self._dy
-            self._shape._angle = math.atan2(self._dy, self._dx) * GameObject.RAD2DEG
+    @property
+    def Hit(self):
+        return self._hit
 
-            if self._shape._x < WORLD_XMIN and self._dx < 0:
-                self._dx *= -1
+    @Hit.setter
+    def Hit(self, value):
+        self._hit = value
 
-            if self._shape._y < WORLD_YMIN and self._dy < 0:
-                self._dy *= -1
-
-            if self._shape._x > WORLD_XMAX and self._dx > 0:
-                self._dx *= -1
-
-            if self._shape._y > WORLD_YMAX and self._dy > 0:
-                self._dy *= -1
+    def move(self,delta_time):
+        pass
 
     def draw(self):
         self._shape.draw()
@@ -141,7 +137,7 @@ class Player(Biomorph, GameObject):
     def Goal(self, goal):
         self._goal = goal
 
-    def move(self):
+    def move(self, delta_time):
         (x, y) = self._goal
         dx = x - self._shape._x
         dy = y - self._shape._y
@@ -180,6 +176,28 @@ class NPC(Character, GameObject):
     def __str__(self):
         return '    '.join([f"{key.name} = {ap.Value}" for key, ap in self.Aptitudes.items()])
 
+    def move(self, delta_time):
+        if self._hit is True:
+            self._hit_time += delta_time
+            if int(self._hit_time) % 60 > HIT_TIMER:
+                self._hit_time = 0
+                self._hit = False
+        else:
+            self._shape._x += self._dx
+            self._shape._y += self._dy
+            self._shape._angle = math.atan2(self._dy, self._dx) * RAD2DEG
+
+            if self._shape._x < WORLD_XMIN and self._dx < 0:
+                self._dx *= -1
+
+            if self._shape._y < WORLD_YMIN and self._dy < 0:
+                self._dy *= -1
+
+            if self._shape._x > WORLD_XMAX and self._dx > 0:
+                self._dx *= -1
+
+            if self._shape._y > WORLD_YMAX and self._dy > 0:
+                self._dy *= -1
 
 class GameView(arcade.View):
     """ Our custom Window Class"""
@@ -236,9 +254,10 @@ class GameView(arcade.View):
                 3))
         line_list.draw()
 
-        self._player.draw()
         for npc in self._npcs:
             npc.draw()
+
+        self._player.draw()
 
         # display game infos
         minutes = int(self._total_time) // 60
@@ -271,6 +290,13 @@ class GameView(arcade.View):
 
     def on_mouse_press(self, x, y, button, modifiers):
         if button == arcade.MOUSE_BUTTON_LEFT:
+            # test if we've hit a npc
+            for npc in self._neighbours:
+                half_size = npc.Size/2
+                if x >= (npc.X - half_size) and x <= (npc.X + half_size) and y >= (npc.Y - half_size) and y <= (npc.Y + half_size):
+                    npc.Hit = True
+                    
+            # nope them move player
             self._player.Goal = (x, y)
 
     '''
@@ -282,11 +308,11 @@ class GameView(arcade.View):
     def on_update(self, delta_time):
         """ Movement and game logic """
         start_time = timeit.default_timer()
-        self._player.move()
+        self._player.move(delta_time)
         self._neighbours = []
         squared_vision = self._player.Vision**2
         for npc in self._npcs:
-            npc.move()
+            npc.move(delta_time)
             dx = npc.X - self._player.X
             dy = npc.Y - self._player.Y
             if (dx*dx+dy*dy) < squared_vision:
