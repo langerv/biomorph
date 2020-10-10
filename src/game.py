@@ -66,7 +66,7 @@ class Player(Biomorph, GameObject):
     def __init__(self, x, y):
         Biomorph.__init__(self)
         GameObject.__init__(self, x, y)
-        self._goal = (x, y)
+        self._goal = None
         self.set_aptitude(PhysicalAptitudes.PERC, 1)
         self.set_aptitude(PhysicalAptitudes.MOVE, 1)
         self.set_aptitude(PhysicalAptitudes.CONS, 1)
@@ -75,6 +75,7 @@ class Player(Biomorph, GameObject):
         self.set_aptitude(PsychicalAptitudes.ETHQ, 1)
         self._vision = self.get_aptitude(PhysicalAptitudes.PERC).Value * max(SCREEN_WIDTH, SCREEN_HEIGHT)/10
         self._dx = self._dy = self.get_aptitude(PhysicalAptitudes.MOVE).Value*2 # gives a slight advantage to the player
+        self._mindist = math.sqrt(self._dx*self._dx+self._dy*self._dy)
         self._size +=  self.get_aptitude(PhysicalAptitudes.CONS).Value**2
         r = int(self.get_aptitude(PsychicalAptitudes.INTL).Value * 255/5)
         g = int(self.get_aptitude(PsychicalAptitudes.CHAR).Value * 255/5)
@@ -97,14 +98,20 @@ class Player(Biomorph, GameObject):
         self._goal = goal
 
     def update(self, delta_time):
-        (x, y) = self._goal
-        dx = x - self._shape._x
-        dy = y - self._shape._y
-        dist = math.sqrt(dx*dx+dy*dy)
-        if dist > 0:
-            # move
-            self._shape._x = self._shape._x + self._dx * dx/dist if dist > self._dx else x
-            self._shape._y = self._shape._y + self._dy * dy/dist if dist > self._dy else y
+        if self._goal is not None:
+            (x, y) = self._goal
+            dx = x - self._shape._x
+            dy = y - self._shape._y
+            dist = math.sqrt(dx*dx+dy*dy)
+            if dist >= self._mindist:
+                # move
+                self._shape._x += self._dx * dx/dist
+                self._shape._y += self._dy * dy/dist
+            else:
+                # we arrived
+                self._shape._x = x
+                self._shape._y = y
+                self._goal = None
 
 
 class NPC(Character, GameObject):
