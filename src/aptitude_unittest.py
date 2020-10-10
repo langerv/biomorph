@@ -38,7 +38,7 @@ class TestAptitudes(unittest.TestCase):
         plt.plot(x, y4, 'yd', label='Km = {}'.format(m3._km))
         plt.legend()
         plt.xlabel("Morphs")
-        plt.title("Morphogene mu = {} et muMax = {}".format(m1._mu_init, m1._mu_max))
+        plt.title(f"Morphogene mu = {m1._mu_init} et muMax = {m1._mu_max}")
         plt.grid(True)
         plt.show()
        
@@ -75,7 +75,7 @@ class TestAptitudes(unittest.TestCase):
             #target, steps = 5, 1000
             phy.morph(target)
             psy.morph(target)
-            print("Morphogenes: {}, {}".format(phy.Morphogen, psy.Morphogen))
+            print(f"Morphogenes: {phy.Morphogen}, {psy.Morphogen}")
             for i in range(steps):
                 phy.update()
                 psy.update()
@@ -110,7 +110,7 @@ class TestAptitudes(unittest.TestCase):
         A = 3
         Av = 1
         T = 1000
-        plt.title("A = {}, Av = {} et T = {}".format(A, Av, T))
+        plt.title(f"A = {A}, Av = {Av} et T = {T}")
         result = [A]
         Katt = dimming_init(A, Av, T)
         for dt in range(T + int(T/10)):

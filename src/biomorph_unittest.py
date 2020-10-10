@@ -38,7 +38,7 @@ class TestBiomorph(unittest.TestCase):
         # do a morph
         morph_cost = bm.morph_cost(morph_target)
         if morph_cost is not None:
-            print("\nMorph cost = {:.2f}".format(morph_cost))
+            print(f"\nMorph cost = {morph_cost:.2f}")
 
         if bm.morph(morph_target) is False:
             print("Invalid morph!")
