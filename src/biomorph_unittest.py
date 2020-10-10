@@ -17,7 +17,7 @@ class TestBiomorph(unittest.TestCase):
         self.assertEqual(ap.Value, 2)
 
     def test_MorphAptitude(self):
-        # create a biomorph
+        # create a biomorphcls
         bm = Biomorph()
         bm.set_aptitude(PhysicalAptitudes.PERC, 1)
         bm.set_aptitude(PhysicalAptitudes.MOVE, 1)

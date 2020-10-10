@@ -66,6 +66,11 @@ class GameObject(abc.ABC):
 
 '''
 Player class
+
+TODO:
+- Intelligence = color intensity
+= Charisma = variation (r,g,b); r = g = b charisme faible
+
 '''
 class Player(Biomorph, GameObject):
 

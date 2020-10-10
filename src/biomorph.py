@@ -59,10 +59,11 @@ class Biomorph(Character):
     PHY_KA = 0.01
     PSY_KM = 0.05
     PSY_KA = 0.001
-    MORPH_COST = 1000 / math.sqrt(5*25) # energy cost per unit of morphic distance (5 x aptitudes of max value 5)
+    MORPH_COST_ENERGY = 1000
 
     def __init__(self):
         super().__init__()
+        self._morph_cost = 0
 
     def set_aptitude(self, key, value):
         if PhysicalAptitudes.has_key(key.name):
@@ -78,6 +79,7 @@ class Biomorph(Character):
             # Ethique does not morph, so just a regular aptitude
             if key == PsychicalAptitudes.ETHQ:
                 super().set_aptitude(key, value)
+                return # do not add to morph cost
 
             else:
                 self._aptitudes[key] = PsychicalMorph(
@@ -87,23 +89,24 @@ class Biomorph(Character):
                     Biomorph.PSY_KM, 
                     Biomorph.PSY_KA)
 
+        # recompute morph cost
+        self._morph_cost = Biomorph.MORPH_COST_ENERGY / math.sqrt(len(self._aptitudes) * 25)
+#        print(f"old: {Biomorph.MORPH_COST_ENERGY / math.sqrt(5*25):0.1f}, new: {self._morph_cost:0.1f}")
 
     def morph_cost(self, morph_target):
         sum = 0
         for key in self._aptitudes.keys():
             if key == PsychicalAptitudes.ETHQ:
                 continue
-
             morph_target_apt = morph_target.get_aptitude(key)
-
             if morph_target_apt is None:
                 # need to have the same number of aptitudes to succeed
                 # example are blts with less or different aptitudes... 
                 return None
-                
             diff = morph_target_apt.Value - self._aptitudes[key].Value
             sum += diff * diff
-        return math.sqrt(sum) * Biomorph.MORPH_COST # morph cost
+
+        return math.sqrt(sum) * self._morph_cost # morph cost
 
 
     def morph(self, morph_target):
