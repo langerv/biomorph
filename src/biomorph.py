@@ -75,7 +75,6 @@ class Biomorph(Character):
                 Biomorph.PHY_KA)
 
         elif PsychicalAptitudes.has_key(key.name):
-
             # Ethique does not morph, so just a regular aptitude
             if key == PsychicalAptitudes.ETHQ:
                 super().set_aptitude(key, value)
@@ -106,7 +105,7 @@ class Biomorph(Character):
             diff = morph_target_apt.Value - self._aptitudes[key].Value
             sum += diff * diff
 
-        return math.sqrt(sum) * self._morph_cost # morph cost
+        return math.sqrt(sum) * self._morph_cost # compute and return total morph cost
 
 
     def morph(self, morph_target):
