@@ -3,6 +3,7 @@ import arcade
 import timeit
 import random
 import math
+import colorsys
 from shape import Rectangle, Ellipse
 from biomorph import Biomorph
 from character import Character
@@ -52,6 +53,10 @@ class GameObject(abc.ABC):
     def Color(self):
         return self._color
 
+    def HLS_to_Color(self, h, l,s):
+        (r, g, b) = colorsys.hls_to_rgb(h, l, s)
+        return (round(r*255), round(g*255), round(b*255))
+
     def is_inside(self, x, y):
         half_size = self._size/2
         return x >= (self._shape._x - half_size) and x <= (self._shape._x + half_size) and y >= (self._shape._y - half_size) and y <= (self._shape._y + half_size)
@@ -67,11 +72,21 @@ class GameObject(abc.ABC):
 '''
 Player class
 
-TODO:
-- Intelligence = color intensity
-= Charisma = variation (r,g,b); r = g = b charisme faible
+Shape creation:
+    Colors (_color) use an HLS system:
+    - Intelligence defines COLOR INTENSITY (hLs)
+    - Charisma defines COLOR SATURATION (hlS)
+    - COLOR HUE is random
+
+    Behaviour 
+    - Perception defines the vision RADIUS (_vision)
+    - Movement defines the SPEED (_dx, _dy)
+    - Constitution defines the SIZE (_size)
+
+    Shape is random between SQUARE, ELLIPSE, ...
 
 '''
+
 class Player(Biomorph, GameObject):
 
     def __init__(self, x, y):
@@ -85,16 +100,20 @@ class Player(Biomorph, GameObject):
         self.set_aptitude(PhysicalAptitudes.CONS, 1)
         self.set_aptitude(PsychicalAptitudes.INTL, 1)
         self.set_aptitude(PsychicalAptitudes.CHAR, 1)
-        self.set_aptitude(PsychicalAptitudes.ETHQ, 1)
+        
         # define behaviour and shape
         self._vision = self.get_aptitude(PhysicalAptitudes.PERC).Value * max(SCREEN_WIDTH, SCREEN_HEIGHT)/10
         self._dx = self._dy = self.get_aptitude(PhysicalAptitudes.MOVE).Value*2 # gives a slight move advantage to the player
         self._mindist = math.sqrt(self._dx*self._dx+self._dy*self._dy)
         self._size +=  self.get_aptitude(PhysicalAptitudes.CONS).Value**2
-        self._color = (
-            int(self.get_aptitude(PsychicalAptitudes.INTL).Value * 255/5), # r
-            int(self.get_aptitude(PsychicalAptitudes.CHAR).Value * 255/5), # g
-            int(self.get_aptitude(PsychicalAptitudes.ETHQ).Value * 255/5)) # b
+  
+        # compute color
+        self._color = self.HLS_to_Color(
+            0, 
+            self.get_aptitude(PsychicalAptitudes.INTL).Value / 5, 
+            self.get_aptitude(PsychicalAptitudes.CHAR).Value / 5)
+  
+        # create shape
         self._shape = Ellipse(x, y, 0, self._size, self._size, self._color)
 
     def __str__(self):
@@ -138,21 +157,16 @@ class Player(Biomorph, GameObject):
 
         # morph
         if self._morph_target is not None:
-            if self._morph_target.Hit is True and self._morph_target.is_inside(self._shape._x, self._shape._y):
-                print(f"morphing with {self._morph_target}")
+            if self._morph_target.Hit is True:
+                if self._morph_target.is_inside(self._shape._x, self._shape._y):
+                    # start morphs only when we're above the target
+                    print(f"morphing with {self._morph_target}")
             else:
                 self._morph_target = None
 
 
 '''
 NPC class
-
-Shape creation
-shape TODO
-vision (_vision) depends on PERC aptitude => how to visualize?
-speed (_dx, _dy) depends on MOVE aptitude
-size (_size) depends on CONST aptitude
-color (r,g,b) depends on psychical aptitudes (INTL, CHAR, ETHQ)
 '''
 class NPC(Character, GameObject):
 
@@ -161,20 +175,25 @@ class NPC(Character, GameObject):
         GameObject.__init__(self, x, y)
         self._hit = False
         self._hit_time = 0
+
         # define aptitudes
         self.set_aptitude(PhysicalAptitudes.PERC, random.randrange(1,6))
         self.set_aptitude(PhysicalAptitudes.MOVE, random.randrange(1,6))
         self.set_aptitude(PhysicalAptitudes.CONS, random.randrange(1,6))
         self.set_aptitude(PsychicalAptitudes.INTL, random.randrange(1,6))
         self.set_aptitude(PsychicalAptitudes.CHAR, random.randrange(1,6))
-        self.set_aptitude(PsychicalAptitudes.ETHQ, random.randrange(1,6))
+
         # define behaviour and shape
         self._dx = self._dy = self.get_aptitude(PhysicalAptitudes.MOVE).Value
         self._size += self.get_aptitude(PhysicalAptitudes.CONS).Value**2
-        self._color = (
-            int(self.get_aptitude(PsychicalAptitudes.INTL).Value * 255/5), # r
-            int(self.get_aptitude(PsychicalAptitudes.CHAR).Value * 255/5), # g
-            int(self.get_aptitude(PsychicalAptitudes.ETHQ).Value * 255/5)) # b
+
+        # compute color
+        self._color = self.HLS_to_Color(
+            random.random(), 
+            self.get_aptitude(PsychicalAptitudes.INTL).Value / 5, 
+            self.get_aptitude(PsychicalAptitudes.CHAR).Value / 5)
+
+        # create shape
         self._shape = Rectangle(x, y, 0, self._size, self._size, self._color)
 
     def __str__(self):
@@ -273,18 +292,18 @@ class GameView(arcade.View):
         seconds = int(self._total_time) % 60
         output = f"Time: {minutes:02d}:{seconds:02d}"
         arcade.draw_text(output, SCREEN_WIDTH/2 - 100, SCREEN_HEIGHT - 35, arcade.color.WHITE, 25)
-        arcade.draw_text(str(self._player), 150, 16, arcade.color.WHITE, 14)
+        arcade.draw_text(str(self._player), 200, 16, arcade.color.WHITE, 14)
 
         # display performance
         if self._perf:
             # Display timings
             output = f"Processing time: {self._processing_time:.3f}"
-            arcade.draw_text(output, 20, SCREEN_HEIGHT - 15, arcade.color.WHITE, 12)
+            arcade.draw_text(output, 20, SCREEN_HEIGHT - 15, arcade.color.GREEN, 12)
             output = f"Drawing time: {self._draw_time:.3f}"
-            arcade.draw_text(output, 20, SCREEN_HEIGHT - 30, arcade.color.WHITE, 12)
+            arcade.draw_text(output, 20, SCREEN_HEIGHT - 30, arcade.color.GREEN, 12)
             if self._fps is not None:
                 output = f"FPS: {self._fps:.0f}"
-                arcade.draw_text(output, 20, SCREEN_HEIGHT - 45, arcade.color.WHITE, 12)
+                arcade.draw_text(output, 20, SCREEN_HEIGHT - 45, arcade.color.RED, 12)
 
         self._draw_time = timeit.default_timer() - draw_start_time
 
