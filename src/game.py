@@ -33,6 +33,7 @@ class GameObject(abc.ABC):
         self._dx = 0
         self._dy = 0
         self._size = MIN_SHAPE_SIZE
+        self._color = (0,0,0,0)
         self._shape = None
 
     @property
@@ -46,6 +47,10 @@ class GameObject(abc.ABC):
     @property
     def Size(self):
         return self._size
+
+    @property
+    def Color(self):
+        return self._color
 
     @abc.abstractmethod
     def update(self, delta_time):
@@ -64,20 +69,23 @@ class Player(Biomorph, GameObject):
         Biomorph.__init__(self)
         GameObject.__init__(self, x, y)
         self._goal = None
+        # define aptitudes
         self.set_aptitude(PhysicalAptitudes.PERC, 1)
         self.set_aptitude(PhysicalAptitudes.MOVE, 1)
         self.set_aptitude(PhysicalAptitudes.CONS, 1)
         self.set_aptitude(PsychicalAptitudes.INTL, 1)
         self.set_aptitude(PsychicalAptitudes.CHAR, 1)
         self.set_aptitude(PsychicalAptitudes.ETHQ, 1)
+        # define behaviour and shape
         self._vision = self.get_aptitude(PhysicalAptitudes.PERC).Value * max(SCREEN_WIDTH, SCREEN_HEIGHT)/10
-        self._dx = self._dy = self.get_aptitude(PhysicalAptitudes.MOVE).Value*2 # gives a slight advantage to the player
+        self._dx = self._dy = self.get_aptitude(PhysicalAptitudes.MOVE).Value*2 # gives a slight move advantage to the player
         self._mindist = math.sqrt(self._dx*self._dx+self._dy*self._dy)
         self._size +=  self.get_aptitude(PhysicalAptitudes.CONS).Value**2
-        r = int(self.get_aptitude(PsychicalAptitudes.INTL).Value * 255/5)
-        g = int(self.get_aptitude(PsychicalAptitudes.CHAR).Value * 255/5)
-        b = int(self.get_aptitude(PsychicalAptitudes.ETHQ).Value * 255/5)
-        self._shape = Ellipse(x, y, 0, self._size, self._size, (r,g,b,255))
+        self._color = (
+            int(self.get_aptitude(PsychicalAptitudes.INTL).Value * 255/5), # r
+            int(self.get_aptitude(PsychicalAptitudes.CHAR).Value * 255/5), # g
+            int(self.get_aptitude(PsychicalAptitudes.ETHQ).Value * 255/5)) # b
+        self._shape = Ellipse(x, y, 0, self._size, self._size, self._color)
 
     def __str__(self):
         return '    '.join([f"{key.name} = {ap.Value}" for key, ap in self.Aptitudes.items()])
@@ -128,18 +136,21 @@ class NPC(Character, GameObject):
         GameObject.__init__(self, x, y)
         self._hit = False
         self._hit_time = 0
+        # define aptitudes
         self.set_aptitude(PhysicalAptitudes.PERC, random.randrange(1,6))
         self.set_aptitude(PhysicalAptitudes.MOVE, random.randrange(1,6))
         self.set_aptitude(PhysicalAptitudes.CONS, random.randrange(1,6))
         self.set_aptitude(PsychicalAptitudes.INTL, random.randrange(1,6))
         self.set_aptitude(PsychicalAptitudes.CHAR, random.randrange(1,6))
         self.set_aptitude(PsychicalAptitudes.ETHQ, random.randrange(1,6))
+        # define behaviour and shape
         self._dx = self._dy = self.get_aptitude(PhysicalAptitudes.MOVE).Value
         self._size += self.get_aptitude(PhysicalAptitudes.CONS).Value**2
-        r = int(self.get_aptitude(PsychicalAptitudes.INTL).Value * 255/5)
-        g = int(self.get_aptitude(PsychicalAptitudes.CHAR).Value * 255/5)
-        b = int(self.get_aptitude(PsychicalAptitudes.ETHQ).Value * 255/5)
-        self._shape = Rectangle(x, y, 0, self._size, self._size, (r,g,b,255))
+        self._color = (
+            int(self.get_aptitude(PsychicalAptitudes.INTL).Value * 255/5), # r
+            int(self.get_aptitude(PsychicalAptitudes.CHAR).Value * 255/5), # g
+            int(self.get_aptitude(PsychicalAptitudes.ETHQ).Value * 255/5)) # b
+        self._shape = Rectangle(x, y, 0, self._size, self._size, self._color)
 
     def __str__(self):
         return '    '.join([f"{key.name} = {ap.Value}" for key, ap in self.Aptitudes.items()])
@@ -164,16 +175,12 @@ class NPC(Character, GameObject):
             self._shape._x += self._dx
             self._shape._y += self._dy
             self._shape._angle = math.atan2(self._dy, self._dx) * RAD2DEG
-
             if self._shape._x < WORLD_XMIN and self._dx < 0:
                 self._dx *= -1
-
-            if self._shape._y < WORLD_YMIN and self._dy < 0:
-                self._dy *= -1
-
             if self._shape._x > WORLD_XMAX and self._dx > 0:
                 self._dx *= -1
-
+            if self._shape._y < WORLD_YMIN and self._dy < 0:
+                self._dy *= -1
             if self._shape._y > WORLD_YMAX and self._dy > 0:
                 self._dy *= -1
 
@@ -227,8 +234,8 @@ class GameView(arcade.View):
                 self._player.Y,
                 npc.X, 
                 npc.Y,
-                (255,255,255,255), 
-                3))
+                npc.Color, 
+                2))
         line_list.draw()
 
         # render NPCs and Player
