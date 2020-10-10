@@ -16,7 +16,7 @@ WORLD_XMIN =  SCREEN_WIDTH/2 - WORLD_WIDTH/2
 WORLD_XMAX =  SCREEN_WIDTH/2 + WORLD_WIDTH/2
 WORLD_YMIN =  SCREEN_HEIGHT/2 - WORLD_HEIGHT/2
 WORLD_YMAX =  SCREEN_HEIGHT/2 + WORLD_HEIGHT/2
-NUM_NPC = 30
+NUM_NPC = 20
 
 class Shape():
     def __init__(self, x, y, angle, width, height, color):
