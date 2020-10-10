@@ -52,6 +52,10 @@ class GameObject(abc.ABC):
     def Color(self):
         return self._color
 
+    def is_inside(self, x, y):
+        half_size = self._size/2
+        return x >= (self._shape._x - half_size) and x <= (self._shape._x + half_size) and y >= (self._shape._y - half_size) and y <= (self._shape._y + half_size)
+
     @abc.abstractmethod
     def update(self, delta_time):
         pass
@@ -126,10 +130,10 @@ class Player(Biomorph, GameObject):
                 self._shape._x = x
                 self._shape._y = y
                 self._goal = None
-                
+
         # morph
         if self._morph_target is not None:
-            if self._morph_target.Hit is True:
+            if self._morph_target.Hit is True and self._morph_target.is_inside(self._shape._x, self._shape._y):
                 print(f"morphing with {self._morph_target}")
             else:
                 self._morph_target = None
@@ -292,8 +296,7 @@ class GameView(arcade.View):
         if button == arcade.MOUSE_BUTTON_LEFT:
             # test if we've hit a npc
             for npc in self._neighbours:
-                half_size = npc.Size/2
-                if x >= (npc.X - half_size) and x <= (npc.X + half_size) and y >= (npc.Y - half_size) and y <= (npc.Y + half_size):
+                 if npc.is_inside(x, y):
                     if npc.Hit is False:
                         npc.Hit = True
                     else:
