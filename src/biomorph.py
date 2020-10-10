@@ -61,10 +61,8 @@ class Biomorph(Character):
     PSY_KA = 0.001
     MORPH_COST = 1000 / math.sqrt(5*25) # energy cost per unit of morphic distance (5 x aptitudes of max value 5)
 
-
     def __init__(self):
         super().__init__()
-
 
     def set_aptitude(self, key, value):
         if PhysicalAptitudes.has_key(key.name):
