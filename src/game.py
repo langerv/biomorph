@@ -71,6 +71,7 @@ class GameObject():
         self._dy = 0
         self._size = GameObject.MIN_SHAPE_SIZE
         self._shape = None
+        self._hit = False
 
     @property
     def X(self):
@@ -80,22 +81,26 @@ class GameObject():
     def Y(self):
         return self._shape._y
 
+    def hit(self):
+        self._hit = True
+
     def move(self):
-        self._shape._x += self._dx
-        self._shape._y += self._dy
-        self._shape._angle = math.atan2(self._dy, self._dx) * GameObject.RAD2DEG
+        if self._hit is False:
+            self._shape._x += self._dx
+            self._shape._y += self._dy
+            self._shape._angle = math.atan2(self._dy, self._dx) * GameObject.RAD2DEG
 
-        if self._shape._x < WORLD_XMIN and self._dx < 0:
-            self._dx *= -1
+            if self._shape._x < WORLD_XMIN and self._dx < 0:
+                self._dx *= -1
 
-        if self._shape._y < WORLD_YMIN and self._dy < 0:
-            self._dy *= -1
+            if self._shape._y < WORLD_YMIN and self._dy < 0:
+                self._dy *= -1
 
-        if self._shape._x > WORLD_XMAX and self._dx > 0:
-            self._dx *= -1
+            if self._shape._x > WORLD_XMAX and self._dx > 0:
+                self._dx *= -1
 
-        if self._shape._y > WORLD_YMAX and self._dy > 0:
-            self._dy *= -1
+            if self._shape._y > WORLD_YMAX and self._dy > 0:
+                self._dy *= -1
 
     def draw(self):
         self._shape.draw()
