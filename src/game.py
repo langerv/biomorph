@@ -69,6 +69,7 @@ class Player(Biomorph, GameObject):
         Biomorph.__init__(self)
         GameObject.__init__(self, x, y)
         self._goal = None
+        self._morph_target = None
         # define aptitudes
         self.set_aptitude(PhysicalAptitudes.PERC, 1)
         self.set_aptitude(PhysicalAptitudes.MOVE, 1)
@@ -102,6 +103,14 @@ class Player(Biomorph, GameObject):
     def Goal(self, goal):
         self._goal = goal
 
+    @property
+    def Target(self):
+        return self._morph_target
+
+    @Target.setter
+    def Target(self, target):
+        self._morph_target = target
+
     def update(self, delta_time):
         if self._goal is not None:
             (x, y) = self._goal
@@ -117,6 +126,13 @@ class Player(Biomorph, GameObject):
                 self._shape._x = x
                 self._shape._y = y
                 self._goal = None
+                
+        # morph
+        if self._morph_target is not None:
+            if self._morph_target.Hit is True:
+                print(f"morphing with {self._morph_target}")
+            else:
+                self._morph_target = None
 
 
 '''
@@ -226,7 +242,7 @@ class GameView(arcade.View):
         # render game stuffs
         arcade.start_render()
 
-        # draw lines between player and perceived shapes
+        # draw perception lines between player and perceived shapes
         line_list = arcade.ShapeElementList()
         for npc in self._neighbours:
             line_list.append(arcade.create_line(
@@ -278,7 +294,10 @@ class GameView(arcade.View):
             for npc in self._neighbours:
                 half_size = npc.Size/2
                 if x >= (npc.X - half_size) and x <= (npc.X + half_size) and y >= (npc.Y - half_size) and y <= (npc.Y + half_size):
-                    npc.Hit = True
+                    if npc.Hit is False:
+                        npc.Hit = True
+                    else:
+                        self._player.Target = npc
             # move player
             self._player.Goal = (x, y)
 
