@@ -33,8 +33,7 @@ class GameObject(abc.ABC):
         self._angle = 0
         self._dx = 0
         self._dy = 0
-        self._size = MIN_SHAPE_SIZE
-        self._color = (0,0,0,0)
+        self._size = 0
         self._shape = None
 
     @property
@@ -51,7 +50,7 @@ class GameObject(abc.ABC):
 
     @property
     def Color(self):
-        return self._color
+        return self._shape._color if self._shape is not None else None
 
     def HLS_to_Color(self, h, l,s):
         (r, g, b) = colorsys.hls_to_rgb(h, l, s)
@@ -100,24 +99,22 @@ class Player(Biomorph, GameObject):
         self.set_aptitude(PhysicalAptitudes.CONS, 1)
         self.set_aptitude(PsychicalAptitudes.INTL, 1)
         self.set_aptitude(PsychicalAptitudes.CHAR, 1)
-        
+
         # define behaviour and shape
         self._vision = self.get_aptitude(PhysicalAptitudes.PERC).Value * max(SCREEN_WIDTH, SCREEN_HEIGHT)/10
         self._dx = self._dy = self.get_aptitude(PhysicalAptitudes.MOVE).Value*2 # gives a slight move advantage to the player
         self._mindist = math.sqrt(self._dx*self._dx+self._dy*self._dy)
-        self._size +=  self.get_aptitude(PhysicalAptitudes.CONS).Value**2
-  
+        self._size =  MIN_SHAPE_SIZE + self.get_aptitude(PhysicalAptitudes.CONS).Value**2
         # compute color
         self._color = self.HLS_to_Color(
-            0, 
-            self.get_aptitude(PsychicalAptitudes.INTL).Value / 5, 
-            self.get_aptitude(PsychicalAptitudes.CHAR).Value / 5)
-  
+            0, # H
+            self.get_aptitude(PsychicalAptitudes.INTL).Value / 5, # L
+            self.get_aptitude(PsychicalAptitudes.CHAR).Value / 5) # S
         # create shape
         self._shape = Ellipse(x, y, 0, self._size, self._size, self._color)
 
     def __str__(self):
-        return '    '.join([f"{key.name} = {ap.Value}" for key, ap in self.Aptitudes.items()])
+        return '    '.join([f"{key.name} = {ap.Value:0.1f}" for key, ap in self.Aptitudes.items()])
 
     @property
     def Vision(self):
@@ -140,6 +137,15 @@ class Player(Biomorph, GameObject):
         self._morph_target = target
 
     def update(self, delta_time):
+        Biomorph.update(self)
+
+        '''
+        self._vision = self.get_aptitude(PhysicalAptitudes.PERC).Value * max(SCREEN_WIDTH, SCREEN_HEIGHT)/10
+        self._dx = self._dy = self.get_aptitude(PhysicalAptitudes.MOVE).Value*2 # gives a slight move advantage to the player
+        self._mindist = math.sqrt(self._dx*self._dx+self._dy*self._dy)
+        self._size =  MIN_SHAPE_SIZE + self.get_aptitude(PhysicalAptitudes.CONS).Value**2
+        '''
+
         if self._goal is not None:
             (x, y) = self._goal
             dx = x - self._shape._x
@@ -160,7 +166,9 @@ class Player(Biomorph, GameObject):
             if self._morph_target.Hit is True:
                 if self._morph_target.is_inside(self._shape._x, self._shape._y):
                     # start morphs only when we're above the target
-                    print(f"morphing with {self._morph_target}")
+                    print(f"morphing...")
+                    self.morph(self._morph_target)
+                    self._morph_target = None
             else:
                 self._morph_target = None
 
@@ -185,19 +193,19 @@ class NPC(Character, GameObject):
 
         # define behaviour and shape
         self._dx = self._dy = self.get_aptitude(PhysicalAptitudes.MOVE).Value
-        self._size += self.get_aptitude(PhysicalAptitudes.CONS).Value**2
+        self._size = MIN_SHAPE_SIZE + self.get_aptitude(PhysicalAptitudes.CONS).Value**2
 
         # compute color
         self._color = self.HLS_to_Color(
-            random.random(), 
-            self.get_aptitude(PsychicalAptitudes.INTL).Value / 5, 
-            self.get_aptitude(PsychicalAptitudes.CHAR).Value / 5)
+            random.random(), # H
+            self.get_aptitude(PsychicalAptitudes.INTL).Value / 5, # L
+            self.get_aptitude(PsychicalAptitudes.CHAR).Value / 5) # S
 
         # create shape
         self._shape = Rectangle(x, y, 0, self._size, self._size, self._color)
 
     def __str__(self):
-        return '    '.join([f"{key.name} = {ap.Value}" for key, ap in self.Aptitudes.items()])
+        return '    '.join([f"{key.name} = {ap.Value:0.1f}" for key, ap in self.Aptitudes.items()])
 
     @property
     def Hit(self):
@@ -350,7 +358,7 @@ def main():
     window = arcade.Window(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
     start_view = GameView()
     start_view.setup()
-    window.set_update_rate(1/40)
+    window.set_update_rate(1/33)
     window.show_view(start_view)
     arcade.run()
 
