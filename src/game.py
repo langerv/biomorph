@@ -297,14 +297,15 @@ class GameView(arcade.View):
 
         # draw perception lines between player and perceived shapes
         line_list = arcade.ShapeElementList()
-        for npc in self._neighbours:
-            line_list.append(arcade.create_line(
-                self._player.X, 
-                self._player.Y,
-                npc.X, 
-                npc.Y,
-                npc.Color, 
-                2))
+        for (npc, squared_dist) in self._neighbours:
+            if squared_dist > 0:
+                line_list.append(arcade.create_line(
+                    self._player.X, 
+                    self._player.Y,
+                    npc.X, 
+                    npc.Y,
+                    npc.Color, 
+                    2))
         line_list.draw()
 
         # render NPCs
@@ -350,7 +351,7 @@ class GameView(arcade.View):
     def on_mouse_press(self, x, y, button, modifiers):
         if button == arcade.MOUSE_BUTTON_LEFT:
             # test if we've hit a npc
-            for npc in self._neighbours:
+            for (npc, _) in self._neighbours:
                  if npc.is_inside(x, y):
                     if npc.Hit is False:
                         npc.Hit = True
@@ -370,8 +371,9 @@ class GameView(arcade.View):
             if npc.X > 0 and npc.Y < SCREEN_WIDTH and npc.Y > 0 and npc.Y < SCREEN_HEIGHT: # cannot be perceived outside of screen  boundaries
                 dx = npc.X - self._player.X
                 dy = npc.Y - self._player.Y
-                if (dx**2+dy**2) < squared_vision: # and only if in range of player's perception
-                    self._neighbours.append(npc)
+                squared_dist = dx**2+dy**2
+                if squared_dist < squared_vision: # and only if in range of player's perception
+                    self._neighbours.append((npc, squared_dist))
 
         self._total_time += delta_time
         self._processing_time = timeit.default_timer() - start_time
