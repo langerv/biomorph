@@ -45,6 +45,10 @@ class GameObject(abc.ABC):
         return self._shape._y
 
     @property
+    def Delta_Speed(self):
+        return math.sqrt(self._dx**2 + self._dy**2)
+
+    @property
     def Size(self):
         return self._size
 
@@ -93,6 +97,7 @@ class Player(Biomorph, GameObject):
         GameObject.__init__(self, x, y)
         self._goal = None
         self._morph_target = None
+
         # define aptitudes
         self.set_aptitude(PhysicalAptitudes.PERC, 1)
         self.set_aptitude(PhysicalAptitudes.MOVE, 1)
@@ -101,15 +106,24 @@ class Player(Biomorph, GameObject):
         self.set_aptitude(PsychicalAptitudes.CHAR, 1)
 
         # define behaviour and shape
-        self._vision = self.get_aptitude(PhysicalAptitudes.PERC).Value * max(SCREEN_WIDTH, SCREEN_HEIGHT)/10
-        self._dx = self._dy = self.get_aptitude(PhysicalAptitudes.MOVE).Value*2 # gives a slight move advantage to the player
-        self._mindist = math.sqrt(self._dx*self._dx+self._dy*self._dy)
-        self._size =  MIN_SHAPE_SIZE + self.get_aptitude(PhysicalAptitudes.CONS).Value**2
+
+        # create rules to transform aptitudes to behaviours
+        self.vision_rule = lambda a : self.get_aptitude(a).Value * max(SCREEN_WIDTH, SCREEN_HEIGHT)/10
+        self.speed_rule = lambda a : self.get_aptitude(a).Value*2 # slight advantage for the player here
+        self.size_rule = lambda a : MIN_SHAPE_SIZE + self.get_aptitude(a).Value**2 
+ 
+        # compute their values
+        self._vision = self.vision_rule(PhysicalAptitudes.PERC)
+        self._dx = self._dy = self.speed_rule(PhysicalAptitudes.MOVE)
+        self._delta = self.Delta_Speed
+        self._size = self.size_rule(PhysicalAptitudes.CONS)
+
         # compute color
         self._color = self.HLS_to_Color(
             0, # H
             self.get_aptitude(PsychicalAptitudes.INTL).Value / 5, # L
             self.get_aptitude(PsychicalAptitudes.CHAR).Value / 5) # S
+
         # create shape
         self._shape = Ellipse(x, y, 0, self._size, self._size, self._color)
 
@@ -139,19 +153,20 @@ class Player(Biomorph, GameObject):
     def update(self, delta_time):
         Biomorph.update(self)
 
-        '''
-        self._vision = self.get_aptitude(PhysicalAptitudes.PERC).Value * max(SCREEN_WIDTH, SCREEN_HEIGHT)/10
-        self._dx = self._dy = self.get_aptitude(PhysicalAptitudes.MOVE).Value*2 # gives a slight move advantage to the player
-        self._mindist = math.sqrt(self._dx*self._dx+self._dy*self._dy)
-        self._size =  MIN_SHAPE_SIZE + self.get_aptitude(PhysicalAptitudes.CONS).Value**2
-        '''
+        # update behaviours from morphing
+        self._vision = self.vision_rule(PhysicalAptitudes.PERC)
+        speed = self.speed_rule(PhysicalAptitudes.MOVE)
+        if speed != self._dx or speed != self._dy:
+            self._dx = self._dy = speed
+            self._delta = self.Delta_Speed
 
+        # Move to Goal
         if self._goal is not None:
             (x, y) = self._goal
             dx = x - self._shape._x
             dy = y - self._shape._y
-            dist = math.sqrt(dx*dx+dy*dy)
-            if dist >= self._mindist:
+            dist = math.sqrt(dx**2+dy**2)
+            if dist >= self._delta:
                 # move
                 self._shape._x += self._dx * dx/dist
                 self._shape._y += self._dy * dy/dist
@@ -166,7 +181,7 @@ class Player(Biomorph, GameObject):
             if self._morph_target.Hit is True:
                 if self._morph_target.is_inside(self._shape._x, self._shape._y):
                     # start morphs only when we're above the target
-                    print(f"morphing...")
+                    print(f"morphing to {self._morph_target}")
                     self.morph(self._morph_target)
                     self._morph_target = None
             else:
@@ -293,6 +308,9 @@ class GameView(arcade.View):
         # render NPCs and Player
         for npc in self._npcs:
             npc.draw()
+            if npc.Hit is True:
+                arcade.draw_text(str(npc), 200, 32, npc.Color, 14)
+
         self._player.draw()
 
         # display game infos
@@ -331,6 +349,7 @@ class GameView(arcade.View):
                  if npc.is_inside(x, y):
                     if npc.Hit is False:
                         npc.Hit = True
+                        return
                     else:
                         self._player.Target = npc
             # move player
@@ -358,7 +377,7 @@ def main():
     window = arcade.Window(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
     start_view = GameView()
     start_view.setup()
-    window.set_update_rate(1/33)
+    window.set_update_rate(1/40)
     window.show_view(start_view)
     arcade.run()
 

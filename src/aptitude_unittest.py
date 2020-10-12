@@ -23,10 +23,10 @@ class TestAptitudes(unittest.TestCase):
         y4 = np.empty(n)
 
         for i in range(0, n):
-            y1[i] = m1.Morphogen
-            y2[i] = m2.Morphogen
-            y3[i] = m3.Morphogen
-            y4[i] = m4.Morphogen
+            y1[i] = m1.Mu
+            y2[i] = m2.Mu
+            y3[i] = m3.Mu
+            y4[i] = m4.Mu
             m1.morph()
             m2.morph()
             m3.morph()
@@ -75,7 +75,7 @@ class TestAptitudes(unittest.TestCase):
             #target, steps = 5, 1000
             phy.morph(target)
             psy.morph(target)
-            print(f"Morphogenes: {phy.Morphogen}, {psy.Morphogen}")
+            print(f"Morphogenes: {phy.Mu}, {psy.Mu}")
             for i in range(steps):
                 phy.update()
                 psy.update()

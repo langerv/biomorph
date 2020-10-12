@@ -19,8 +19,20 @@ class AptitudeMorph(AptitudeBase):
         self._ka = ka
 
     @property
-    def Morphogen(self):
+    def Mu(self):
         return self._mu
+
+    @Mu.setter
+    def Mu(self, value):
+        self._mu = value
+
+    @property
+    def Mu_Max(self):
+        return self._mu_max
+
+    @Mu_Max.setter
+    def Mu_Max(self, value):
+        self._mu_max = value
 
     def morph(self, target=0):
         self._target_value = target * self._mu
