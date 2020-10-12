@@ -347,9 +347,6 @@ class GameView(arcade.View):
         #    self.window.set_fullscreen(not self.window.fullscreen)
         #    self.window.set_viewport(0, SCREEN_WIDTH, 0, SCREEN_HEIGHT)
 
-    def on_mouse_motion(self, x, y, dx, dy):
-        pass
-
     def on_mouse_press(self, x, y, button, modifiers):
         if button == arcade.MOUSE_BUTTON_LEFT:
             # test if we've hit a npc
