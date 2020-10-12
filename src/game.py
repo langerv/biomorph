@@ -256,7 +256,6 @@ class NPC(Character, GameObject):
 GameView class: main gameplay screen
 '''
 class GameView(arcade.View):
-    """ Our custom Window Class"""
 
     def __init__(self):
         super().__init__()
@@ -269,6 +268,9 @@ class GameView(arcade.View):
         self._total_time = 0.0        
         self._npcs = None
         self._neighbours = []
+        #width, height = self.window.get_size()
+        #self.window.set_viewport(0, width, 0, height)
+
 
     def setup(self):
         x = SCREEN_WIDTH/2 #random.randrange(50, SCREEN_WIDTH-50)
@@ -305,12 +307,15 @@ class GameView(arcade.View):
                 2))
         line_list.draw()
 
-        # render NPCs and Player
+        # render NPCs
+        text_y = 16
         for npc in self._npcs:
             npc.draw()
             if npc.Hit is True:
-                arcade.draw_text(str(npc), 200, 32, npc.Color, 14)
+                text_y += 16
+                arcade.draw_text(str(npc), 200, text_y, npc.Color, 14)
 
+        # render player
         self._player.draw()
 
         # display game infos
@@ -338,7 +343,10 @@ class GameView(arcade.View):
             arcade.close_window()
         elif key == arcade.key.F1:
             self._perf = not self._perf
-        
+        #elif key == arcade.key.SPACE:
+        #    self.window.set_fullscreen(not self.window.fullscreen)
+        #    self.window.set_viewport(0, SCREEN_WIDTH, 0, SCREEN_HEIGHT)
+
     def on_mouse_motion(self, x, y, dx, dy):
         pass
 
@@ -362,10 +370,11 @@ class GameView(arcade.View):
         squared_vision = self._player.Vision**2
         for npc in self._npcs:
             npc.update(delta_time)
-            dx = npc.X - self._player.X
-            dy = npc.Y - self._player.Y
-            if (dx*dx+dy*dy) < squared_vision:
-                self._neighbours.append(npc)
+            if npc.X > 0 and npc.Y < SCREEN_WIDTH and npc.Y > 0 and npc.Y < SCREEN_HEIGHT: # cannot be perceived outside of screen  boundaries
+                dx = npc.X - self._player.X
+                dy = npc.Y - self._player.Y
+                if (dx**2+dy**2) < squared_vision: # and only if in range of player's perception
+                    self._neighbours.append(npc)
 
         self._total_time += delta_time
         self._processing_time = timeit.default_timer() - start_time
