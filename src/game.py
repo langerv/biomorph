@@ -271,7 +271,6 @@ class GameView(arcade.View):
         #width, height = self.window.get_size()
         #self.window.set_viewport(0, width, 0, height)
 
-
     def setup(self):
         x = SCREEN_WIDTH/2 #random.randrange(50, SCREEN_WIDTH-50)
         y = SCREEN_HEIGHT/2 #random.randrange(50, SCREEN_HEIGHT-50)
@@ -314,7 +313,7 @@ class GameView(arcade.View):
             npc.draw()
             if npc.Hit is True:
                 text_y += 16
-                arcade.draw_text(str(npc), 200, text_y, npc.Color, 14)
+                arcade.draw_text(str(npc), SCREEN_WIDTH/2, text_y, npc.Color, 14, anchor_x='center')
 
         # render player
         self._player.draw()
@@ -324,7 +323,7 @@ class GameView(arcade.View):
         seconds = int(self._total_time) % 60
         output = f"Time: {minutes:02d}:{seconds:02d}"
         arcade.draw_text(output, SCREEN_WIDTH/2 - 100, SCREEN_HEIGHT - 35, arcade.color.WHITE, 25)
-        arcade.draw_text(str(self._player), 200, 16, arcade.color.WHITE, 14)
+        arcade.draw_text(str(self._player), SCREEN_WIDTH/2, 16, arcade.color.WHITE, 14, anchor_x='center')
 
         # display performance
         if self._perf:
@@ -378,17 +377,78 @@ class GameView(arcade.View):
         self._total_time += delta_time
         self._processing_time = timeit.default_timer() - start_time
 
+
+class MenuView(arcade.View):
+
+    #def __init__(self):
+    #    self._alpha = 0
+
+    def on_show(self):
+        self._alpha_delta = 2
+        self._alpha = 0
+        self._shapes = arcade.ShapeElementList()
+        self._blink = False
+        self._count = 0
+        color1 = (5,10,5)
+        color2 = (10,20,10)
+        points = (0, 0), (SCREEN_WIDTH, 0), (SCREEN_WIDTH, SCREEN_HEIGHT), (0, SCREEN_HEIGHT)
+        colors = (color1, color1, color2, color2)
+        rect = arcade.create_rectangle_filled_with_colors(points, colors)
+        self._shapes.append(rect)
+    
+    def on_update(self, delta_time):
+        self._count += 1
+        if self._count % 20 == 0:
+            self._blink = not self._blink
+
+        self._alpha += self._alpha_delta
+        if self._alpha > 255:
+            self._alpha = 255
+            self._alpha_delta *= -1
+        elif self._alpha < 0:
+            self._alpha =0
+            self._alpha_delta *= -1
+    
+    def on_key_press(self, key, modifiers):
+        if key == arcade.key.ESCAPE:
+            arcade.close_window()
+
+    def on_draw(self):
+        arcade.start_render()
+        self._shapes.draw()
+        arcade.draw_text(
+            "Biomorph game", 
+            SCREEN_WIDTH/2, 
+            SCREEN_HEIGHT/2 + 60, 
+            (180,230,180, self._alpha), 
+            font_size=60,
+            anchor_x="center",
+            anchor_y="center")
+
+        if self._blink is True:
+            arcade.draw_text(
+                "Click to PLAY!", 
+                SCREEN_WIDTH/2, 
+                SCREEN_HEIGHT/2-75, 
+                arcade.color.GREEN_YELLOW, 
+                font_size=20, 
+                anchor_x="center")
+
+    def on_mouse_press(self, _x, _y, _button, _modifiers):
+        start_view = GameView()
+        start_view.setup()
+        self.window.show_view(start_view)
+
 '''
 main function: initialize and start the game screens
 '''
 def main():
     window = arcade.Window(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
-    start_view = GameView()
-    start_view.setup()
+    menu_view = MenuView()
+    window.show_view(menu_view)
     window.set_update_rate(1/40)
-    window.show_view(start_view)
     arcade.run()
-
+ 
 
 if __name__ == "__main__":
     main()
