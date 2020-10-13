@@ -307,9 +307,10 @@ class GameView(arcade.View):
                     self._player.Y,
                     npc.X, 
                     npc.Y,
-                    npc.Color, 
+                    npc.Color,
                     2))
-        line_list.draw()
+        else:
+            line_list.draw()
 
         # render NPCs
         text_y = 16
@@ -389,10 +390,10 @@ class MenuView(arcade.View):
 
     def on_show(self):
         self._alpha_delta = 2
-        self._alpha = 0
-        self._shapes = arcade.ShapeElementList()
+        self._title_color = [180, 230, 180, 0] 
+        self._count_frame = 0
         self._blink = False
-        self._count = 0
+        self._shapes = arcade.ShapeElementList()
         color1 = (5,10,5)
         color2 = (10,20,10)
         points = (0, 0), (SCREEN_WIDTH, 0), (SCREEN_WIDTH, SCREEN_HEIGHT), (0, SCREEN_HEIGHT)
@@ -401,18 +402,11 @@ class MenuView(arcade.View):
         self._shapes.append(rect)
     
     def on_update(self, delta_time):
-        self._count += 1
-        if self._count % 20 == 0:
+        self._count_frame += 1
+        if self._count_frame % 20 == 0:
             self._blink = not self._blink
+        self._title_color[3] = 255 if self._title_color[3] >= 255 else self._title_color[3] + self._alpha_delta
 
-        self._alpha += self._alpha_delta
-        if self._alpha > 255:
-            self._alpha = 255
-            self._alpha_delta *= -1
-        elif self._alpha < 0:
-            self._alpha =0
-            self._alpha_delta *= -1
-    
     def on_key_press(self, key, modifiers):
         if key == arcade.key.ESCAPE:
             arcade.close_window()
@@ -421,10 +415,10 @@ class MenuView(arcade.View):
         arcade.start_render()
         self._shapes.draw()
         arcade.draw_text(
-            "Biomorph game", 
+            "Biomorph game\n", 
             SCREEN_WIDTH/2, 
             SCREEN_HEIGHT/2 + 60, 
-            (180,230,180, self._alpha), 
+            self._title_color, 
             font_size=60,
             anchor_x="center",
             anchor_y="center")

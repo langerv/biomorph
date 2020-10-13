@@ -102,18 +102,18 @@ class Biomorph(Character):
 
         # recompute morph cost
         self._morph_cost = Biomorph.MORPH_COST_ENERGY / math.sqrt(len(self._aptitudes) * 25)
-#        print(f"old: {Biomorph.MORPH_COST_ENERGY / math.sqrt(5*25):0.1f}, new: {self._morph_cost:0.1f}")
 
     def morph_cost(self, morph_target):
         sum = 0
         for key in self._aptitudes.keys():
             if key == PsychicalAptitudes.ETHQ:
                 continue
+
             morph_target_apt = morph_target.get_aptitude(key)
             if morph_target_apt is None:
-                # need to have the same number of aptitudes to succeed
-                # example are blts with less or different aptitudes... 
+                # need to have the same aptitudes to succeed
                 return None
+
             diff = morph_target_apt.Value - self._aptitudes[key].Value
             sum += diff * diff
 
@@ -128,7 +128,6 @@ class Biomorph(Character):
             morph_target_apt = morph_target.get_aptitude(key)
             if morph_target_apt is None:
                 # need to have the same number of aptitudes to succeed
-                # example are blts with less or different aptitudes... 
                 return False
 
             apt.morph(morph_target_apt.Value)
