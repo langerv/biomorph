@@ -106,26 +106,25 @@ class Player(Biomorph, GameObject):
         self.set_aptitude(PsychicalAptitudes.CHAR, 1)
 
         # define behaviour and shape
-
         # create rules to transform aptitudes to behaviours
         self.vision_rule = lambda a : self.get_aptitude(a).Value * max(SCREEN_WIDTH, SCREEN_HEIGHT)/10
         self.speed_rule = lambda a : self.get_aptitude(a).Value*2 # slight advantage for the player here
         self.size_rule = lambda a : MIN_SHAPE_SIZE + self.get_aptitude(a).Value**2 
- 
+        self.color_rule = lambda a, b :  self.HLS_to_Color(
+            self._hue, # H
+            self.get_aptitude(a).Value / 5, # L
+            self.get_aptitude(b).Value / 5) # S
+
         # compute their values
         self._vision = self.vision_rule(PhysicalAptitudes.PERC)
         self._dx = self._dy = self.speed_rule(PhysicalAptitudes.MOVE)
         self._delta = self.Delta_Speed
         self._size = self.size_rule(PhysicalAptitudes.CONS)
-
-        # compute color
-        self._color = self.HLS_to_Color(
-            0, # H
-            self.get_aptitude(PsychicalAptitudes.INTL).Value / 5, # L
-            self.get_aptitude(PsychicalAptitudes.CHAR).Value / 5) # S
+        self._hue = 0
+        self._color = self.color_rule(PsychicalAptitudes.INTL, PsychicalAptitudes.CHAR)
 
         # create shape
-        self._shape = Ellipse(x, y, 0, self._size, self._size, self._color)
+        self._shape = Ellipse(x, y, 0, self._size/2, self._size/2, self._color)
 
     def __str__(self):
         return '    '.join([f"{key.name} = {ap.Value:0.1f}" for key, ap in self.Aptitudes.items()])
@@ -159,6 +158,9 @@ class Player(Biomorph, GameObject):
         if speed != self._dx or speed != self._dy:
             self._dx = self._dy = speed
             self._delta = self.Delta_Speed
+        self._size = self.size_rule(PhysicalAptitudes.CONS)
+        self._color = self.color_rule(PsychicalAptitudes.INTL, PsychicalAptitudes.CHAR)
+        self._shape = Ellipse(self._shape._x, self._shape._y, 0, self._size/2, self._size/2, self._color)
 
         # Move to Goal
         if self._goal is not None:
@@ -183,6 +185,7 @@ class Player(Biomorph, GameObject):
                     # start morphs only when we're above the target
                     print(f"morphing to {self._morph_target}")
                     self.morph(self._morph_target)
+                    self._hue = self._morph_target._hue
                     self._morph_target = None
             else:
                 self._morph_target = None
@@ -211,8 +214,9 @@ class NPC(Character, GameObject):
         self._size = MIN_SHAPE_SIZE + self.get_aptitude(PhysicalAptitudes.CONS).Value**2
 
         # compute color
+        self._hue = random.random()
         self._color = self.HLS_to_Color(
-            random.random(), # H
+            self._hue, # H
             self.get_aptitude(PsychicalAptitudes.INTL).Value / 5, # L
             self.get_aptitude(PsychicalAptitudes.CHAR).Value / 5) # S
 
