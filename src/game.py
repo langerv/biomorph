@@ -36,7 +36,9 @@ LEVEL_1 = {
         'pos':(SCREEN_WIDTH/2, SCREEN_HEIGHT/2)
         },
     'npc' : [
-        {'quantity':30, 'area':(WORLD_XMIN, WORLD_YMIN, WORLD_XMAX, WORLD_YMAX)}
+        {
+            'quantity':30, 
+            'area':(WORLD_XMIN, WORLD_YMIN, WORLD_XMAX, WORLD_YMAX)}
     ]
 }
 
@@ -47,7 +49,11 @@ LEVEL_2 = {
         'obstacles' : [
             {
                 'color':arcade.color.BLUE_GREEN,
-                'rectangle':(0,SCREEN_HEIGHT/2+50,SCREEN_WIDTH,20)
+                'rectangle':(0,450,300,100)
+            },
+            {
+                'color':arcade.color.BLUE_GREEN,
+                'rectangle':(500,450,300,100)
             }
         ]
     },
@@ -55,7 +61,12 @@ LEVEL_2 = {
         'pos':(SCREEN_WIDTH/2, SCREEN_HEIGHT/2)
         },
     'npc' : [
-        {'quantity':10, 'area':(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT/2)}
+        {
+            'quantity':10, 
+            'area':(WORLD_XMIN, WORLD_YMIN, WORLD_XMAX, SCREEN_HEIGHT/2)},
+        {
+            'quantity':1,
+            'area':(350,400,450,500)}
     ]
 }
 
@@ -276,7 +287,7 @@ class NPC(Character, GameObject):
                 self._hit_time = 0
                 self._hit = False
         else:
-            # move
+            # wander
             self._shape._x += self._dx
             self._shape._y += self._dy
             self._shape._angle = math.atan2(self._dy, self._dx) * RAD2DEG
@@ -313,6 +324,7 @@ class GameView(arcade.View):
     def setup(self, level):
         self._background_shape = arcade.ShapeElementList()
         self._map = arcade.ShapeElementList()
+        self._obstacles = []
         if 'map' in level:
             map_dict = level['map']
             if 'color1' in map_dict:
@@ -331,12 +343,13 @@ class GameView(arcade.View):
                         if 'rectangle' in obstacle:
                             (x, y, width, height) = obstacle['rectangle']
                             point_list = [
-                                (x, y),
-                                (x+width, y),
-                                (x+width, y-height),
-                                (x, y-height)]
+                                (x, y), # xmin, ymin
+                                (x+width, y), #xmax, ymin
+                                (x+width, y-height), #xmax, ymax
+                                (x, y-height)] #xmin, ymax
 
                         if point_list is not None:
+                            self._obstacles.append(point_list)
                             self._map.append(arcade.create_polygon(
                                     point_list,
                                     obstacle['color']))
@@ -511,7 +524,7 @@ class MenuView(arcade.View):
 
     def on_mouse_press(self, _x, _y, _button, _modifiers):
         start_view = GameView()
-        start_view.setup(LEVEL_1)
+        start_view.setup(LEVEL_2)
         self.window.show_view(start_view)
 
 '''
