@@ -19,14 +19,45 @@ WORLD_XMIN =  SCREEN_WIDTH/2 - WORLD_WIDTH/2
 WORLD_XMAX =  SCREEN_WIDTH/2 + WORLD_WIDTH/2
 WORLD_YMIN =  SCREEN_HEIGHT/2 - WORLD_HEIGHT/2
 WORLD_YMAX =  SCREEN_HEIGHT/2 + WORLD_HEIGHT/2
-NUM_NPC = 30
 HIT_TIMER = 5 # number of seconds before a hit npc goes back to life
 MIN_SHAPE_SIZE = 20
 RAD2DEG = 180 / math.pi
 
 '''
+Game levels
+'''
+
+LEVEL_1 = {
+    'background': {
+        'color1':(5, 10, 5), 
+        'color2':(10, 20, 10)
+        },
+    'player': {
+        'pos':(SCREEN_WIDTH/2, SCREEN_HEIGHT/2)
+        },
+    'npc' : [
+        {'quantity':30, 'area':(WORLD_XMIN, WORLD_XMAX, WORLD_YMIN, WORLD_YMAX)}
+    ]
+}
+
+LEVEL_2 = {
+    'background': {
+        'color1':(10, 5, 5), 
+        'color2':(20, 10, 10)
+        },
+    'player': {
+        'pos':(SCREEN_WIDTH/2, SCREEN_HEIGHT/2)
+        },
+    'npc' : [
+        {'quantity':5, 'area':(0, SCREEN_WIDTH, 0, SCREEN_HEIGHT/2 - 100)}
+    ]
+}
+
+
+'''
 GameObject class
 '''
+
 class GameObject(abc.ABC):
 
     def __init__(self, x, y):
@@ -74,20 +105,16 @@ class GameObject(abc.ABC):
 
 '''
 Player class
-
 Shape creation:
     Colors (_color) use an HLS system:
     - Intelligence defines COLOR INTENSITY (hLs)
     - Charisma defines COLOR SATURATION (hlS)
     - COLOR HUE is random
-
     Behaviour 
     - Perception defines the vision RADIUS (_vision)
     - Movement defines the SPEED (_dx, _dy)
     - Constitution defines the SIZE (_size)
-
     Shape is random between SQUARE, ELLIPSE, ...
-
 '''
 
 class Player(Biomorph, GameObject):
@@ -196,11 +223,12 @@ NPC class
 '''
 class NPC(Character, GameObject):
 
-    def __init__(self, x, y):
+    def __init__(self, x, y, area):
         Character.__init__(self)
         GameObject.__init__(self, x, y)
         self._hit = False
         self._hit_time = 0
+        self._area = area
 
         # define aptitudes
         self.set_aptitude(PhysicalAptitudes.PERC, random.randrange(1,6))
@@ -246,19 +274,20 @@ class NPC(Character, GameObject):
             self._shape._x += self._dx
             self._shape._y += self._dy
             self._shape._angle = math.atan2(self._dy, self._dx) * RAD2DEG
-            if self._shape._x < WORLD_XMIN and self._dx < 0:
+            if self._shape._x < self._area[0] and self._dx < 0:
                 self._dx *= -1
-            if self._shape._x > WORLD_XMAX and self._dx > 0:
+            if self._shape._x > self._area[1] and self._dx > 0:
                 self._dx *= -1
-            if self._shape._y < WORLD_YMIN and self._dy < 0:
+            if self._shape._y < self._area[2] and self._dy < 0:
                 self._dy *= -1
-            if self._shape._y > WORLD_YMAX and self._dy > 0:
+            if self._shape._y > self._area[3] and self._dy > 0:
                 self._dy *= -1
 
 
 '''
 GameView class: main gameplay screen
 '''
+
 class GameView(arcade.View):
 
     def __init__(self):
@@ -275,23 +304,42 @@ class GameView(arcade.View):
         #width, height = self.window.get_size()
         #self.window.set_viewport(0, width, 0, height)
 
-    def setup(self):
+    def setup(self, level=None):
         self._background_shape = arcade.ShapeElementList()
-        color1 = (5,10,5)
-        color2 = (10,20,10)
-        points = (0, 0), (SCREEN_WIDTH, 0), (SCREEN_WIDTH, SCREEN_HEIGHT), (0, SCREEN_HEIGHT)
-        colors = (color1, color1, color2, color2)
-        rect = arcade.create_rectangle_filled_with_colors(points, colors)
-        self._background_shape.append(rect)
-        # create characters        
-        x = SCREEN_WIDTH/2 #random.randrange(50, SCREEN_WIDTH-50)
-        y = SCREEN_HEIGHT/2 #random.randrange(50, SCREEN_HEIGHT-50)
-        self._player = Player(x, y)
+        if 'background' in level:
+            background_dict = level['background']
+            color1 = color2 = None
+            if 'color1' in background_dict:
+                color1 = background_dict['color1']
+            if 'color2' in background_dict:
+                color2 = background_dict['color2']
+            if color1 is not None and color2 is not None:
+                points = (0, 0), (SCREEN_WIDTH, 0), (SCREEN_WIDTH, SCREEN_HEIGHT), (0, SCREEN_HEIGHT)
+                colors = (color1, color1, color2, color2)
+                rect = arcade.create_rectangle_filled_with_colors(points, colors)
+                self._background_shape.append(rect)
+
+        if 'player' in level:
+            player_dict = level['player']
+            if 'pos' in player_dict:
+                pos = player_dict['pos']
+                self._player = Player(pos[0], pos[1])
+            else:
+                # we need a player so by default position is the center of the screen
+                self._player = Player(SCREEN_WIDTH/2, SCREEN_HEIGHT/2)
+
         self._npcs = []
-        for _ in range(NUM_NPC):
-            x = random.randrange(WORLD_XMIN, WORLD_XMAX)
-            y = random.randrange(WORLD_YMIN, WORLD_YMAX)
-            self._npcs.append(NPC(x, y))
+        if 'npc' in level:
+            npc_list = level['npc']
+            for npc_dict in npc_list:
+                if 'quantity' in npc_dict:
+                    num = npc_dict['quantity']
+                    if 'area' in npc_dict:
+                        area = npc_dict['area']
+                        for _ in range(num):
+                            x = random.randrange(area[0], area[1])
+                            y = random.randrange(area[2], area[3])
+                            self._npcs.append(NPC(x, y, area))
 
     def on_draw(self):
         # Start timing how long this takes and count frames
@@ -336,7 +384,7 @@ class GameView(arcade.View):
         minutes = int(self._total_time) // 60
         seconds = int(self._total_time) % 60
         output = f"Time: {minutes:02d}:{seconds:02d}"
-        arcade.draw_text(output, SCREEN_WIDTH/2 - 100, SCREEN_HEIGHT - 35, arcade.color.WHITE, 25)
+        arcade.draw_text(output, SCREEN_WIDTH/2, SCREEN_HEIGHT - 35, arcade.color.WHITE, 25, anchor_x='center')
         arcade.draw_text(str(self._player), SCREEN_WIDTH/2, 16, arcade.color.WHITE, 14, anchor_x='center')
 
         # display performance
@@ -402,7 +450,6 @@ class MenuView(arcade.View):
         colors = (color1, color1, color2, color2)
         rect = arcade.create_rectangle_filled_with_colors(points, colors)
         self._background_shape.append(rect)
-        #
         self._alpha_delta = 2
         self._title_color = [180, 230, 180, 0] 
         self._count_frame = 0
@@ -442,7 +489,7 @@ class MenuView(arcade.View):
 
     def on_mouse_press(self, _x, _y, _button, _modifiers):
         start_view = GameView()
-        start_view.setup()
+        start_view.setup(LEVEL_1)
         self.window.show_view(start_view)
 
 '''
