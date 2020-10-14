@@ -304,7 +304,7 @@ class GameView(arcade.View):
         #width, height = self.window.get_size()
         #self.window.set_viewport(0, width, 0, height)
 
-    def setup(self, level=None):
+    def setup(self, level):
         self._background_shape = arcade.ShapeElementList()
         if 'background' in level:
             background_dict = level['background']
