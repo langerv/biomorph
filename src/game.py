@@ -5,7 +5,7 @@ import random
 from shape import Rectangle, Ellipse
 from game_object import GameObject
 from player import Player
-from npc import NPC
+from npc import Wanderer
 
 # --- Constants ---
 SCREEN_WIDTH =  800
@@ -140,7 +140,7 @@ class GameView(arcade.View):
                         for _ in range(num):
                             x = random.randrange(area[0], area[2])
                             y = random.randrange(area[1], area[3])
-                            self._npcs.append(NPC(x, y, area))
+                            self._npcs.append(Wanderer(x, y, area))
 
     def on_draw(self):
         # Start timing how long this takes and count frames

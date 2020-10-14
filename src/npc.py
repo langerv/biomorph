@@ -8,11 +8,12 @@ from aptitude import PhysicalAptitudes, PsychicalAptitudes
 HIT_TIMER = 5 # number of seconds before a hit npc goes back to life
 RAD2DEG = 180 / math.pi
 
+
 '''
 NPC class
 '''
-class NPC(Character, GameObject):
 
+class Npc(Character, GameObject):
 
     def __init__(self, x, y, area):
         Character.__init__(self)
@@ -21,7 +22,46 @@ class NPC(Character, GameObject):
         self._hit_time = 0
         self._area = area
 
-        # define aptitudes
+    def __str__(self):
+        return '    '.join([f"{key.name} = {ap.Value:0.1f}" for key, ap in self.Aptitudes.items()])
+
+    @property
+    def Area(self):
+        return self._area
+
+    @property
+    def Hit(self):
+        return self._hit
+
+    @Hit.setter
+    def Hit(self, value):
+        self._hit = value
+
+
+'''
+Class Guard (NPC)
+Behaviour: 
+'''
+
+class Guard(Npc):
+
+    def __init__(self, x, y, area):
+        Npc.__init__(self, x, y, area)
+
+    def update(self, delta_time):
+        pass
+
+'''
+Class Wanderer (NPC)
+Behaviour: wander in the area and do nothing else (preys)
+'''
+
+class Wanderer(Npc):
+
+    def __init__(self, x, y, area):
+        Npc.__init__(self, x, y, area)
+
+       # define aptitudes
         self.set_aptitude(PhysicalAptitudes.PERC, random.randrange(1,6))
         self.set_aptitude(PhysicalAptitudes.MOVE, random.randrange(1,6))
         self.set_aptitude(PhysicalAptitudes.CONS, random.randrange(1,6))
@@ -41,18 +81,7 @@ class NPC(Character, GameObject):
 
         # create shape
         self._shape = Rectangle(x, y, 0, self._size, self._size, self._color)
-
-    def __str__(self):
-        return '    '.join([f"{key.name} = {ap.Value:0.1f}" for key, ap in self.Aptitudes.items()])
-
-    @property
-    def Hit(self):
-        return self._hit
-
-    @Hit.setter
-    def Hit(self, value):
-        self._hit = value
-
+ 
     def update(self, delta_time):
         if self._hit is True:
             # if a npc is hit, we compute time before to get it back to life
@@ -73,4 +102,3 @@ class NPC(Character, GameObject):
                 self._dy *= -1
             if self._shape._y > self._area[3] and self._dy > 0:
                 self._dy *= -1
-

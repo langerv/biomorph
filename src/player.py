@@ -119,4 +119,3 @@ class Player(Biomorph, GameObject):
                     self._morph_target = None
             else:
                 self._morph_target = None
-

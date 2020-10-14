@@ -17,6 +17,10 @@ class GameObject(abc.ABC):
         self._size = 0
         self._shape = None
 
+    def set_shape(self, shape):
+        print(f"shape = {shape}")
+        self._shape = shape
+
     @property
     def X(self):
         return self._shape._x
@@ -50,5 +54,6 @@ class GameObject(abc.ABC):
         pass
 
     def draw(self):
-        self._shape.draw()
+        if self._shape is not None:
+            self._shape.draw()
         
