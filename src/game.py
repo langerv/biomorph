@@ -28,28 +28,34 @@ Game levels
 '''
 
 LEVEL_1 = {
-    'background': {
-        'color1':(5, 10, 5), 
-        'color2':(10, 20, 10)
+    'map': {
+        'color1':(5,10,5), 
+        'color2':(10,20,10)
         },
     'player': {
         'pos':(SCREEN_WIDTH/2, SCREEN_HEIGHT/2)
         },
     'npc' : [
-        {'quantity':30, 'area':(WORLD_XMIN, WORLD_XMAX, WORLD_YMIN, WORLD_YMAX)}
+        {'quantity':30, 'area':(WORLD_XMIN, WORLD_YMIN, WORLD_XMAX, WORLD_YMAX)}
     ]
 }
 
 LEVEL_2 = {
-    'background': {
-        'color1':(10, 5, 5), 
-        'color2':(20, 10, 10)
-        },
+    'map' : {
+        'color1':(10,5,5), 
+        'color2':(20,10,10),
+        'obstacles' : [
+            {
+                'color':arcade.color.BLUE_GREEN,
+                'rectangle':(0,SCREEN_HEIGHT/2+50,SCREEN_WIDTH,20)
+            }
+        ]
+    },
     'player': {
         'pos':(SCREEN_WIDTH/2, SCREEN_HEIGHT/2)
         },
     'npc' : [
-        {'quantity':5, 'area':(0, SCREEN_WIDTH, 0, SCREEN_HEIGHT/2 - 100)}
+        {'quantity':10, 'area':(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT/2)}
     ]
 }
 
@@ -276,9 +282,9 @@ class NPC(Character, GameObject):
             self._shape._angle = math.atan2(self._dy, self._dx) * RAD2DEG
             if self._shape._x < self._area[0] and self._dx < 0:
                 self._dx *= -1
-            if self._shape._x > self._area[1] and self._dx > 0:
+            if self._shape._x > self._area[2] and self._dx > 0:
                 self._dx *= -1
-            if self._shape._y < self._area[2] and self._dy < 0:
+            if self._shape._y < self._area[1] and self._dy < 0:
                 self._dy *= -1
             if self._shape._y > self._area[3] and self._dy > 0:
                 self._dy *= -1
@@ -306,18 +312,34 @@ class GameView(arcade.View):
 
     def setup(self, level):
         self._background_shape = arcade.ShapeElementList()
-        if 'background' in level:
-            background_dict = level['background']
-            color1 = color2 = None
-            if 'color1' in background_dict:
-                color1 = background_dict['color1']
-            if 'color2' in background_dict:
-                color2 = background_dict['color2']
-            if color1 is not None and color2 is not None:
-                points = (0, 0), (SCREEN_WIDTH, 0), (SCREEN_WIDTH, SCREEN_HEIGHT), (0, SCREEN_HEIGHT)
-                colors = (color1, color1, color2, color2)
-                rect = arcade.create_rectangle_filled_with_colors(points, colors)
-                self._background_shape.append(rect)
+        self._map = arcade.ShapeElementList()
+        if 'map' in level:
+            map_dict = level['map']
+            if 'color1' in map_dict:
+                color1 = map_dict['color1']
+                if 'color2' in map_dict:
+                    color2 = map_dict['color2']
+                    points = (0, 0), (SCREEN_WIDTH, 0), (SCREEN_WIDTH, SCREEN_HEIGHT), (0, SCREEN_HEIGHT)
+                    colors = (color1, color1, color2, color2)
+                    rect = arcade.create_rectangle_filled_with_colors(points, colors)
+                    self._background_shape.append(rect)
+
+            if 'obstacles' in map_dict:
+                for obstacle in map_dict['obstacles']:
+                    if 'color' in obstacle:
+                        point_list = None
+                        if 'rectangle' in obstacle:
+                            (x, y, width, height) = obstacle['rectangle']
+                            point_list = [
+                                (x, y),
+                                (x+width, y),
+                                (x+width, y-height),
+                                (x, y-height)]
+
+                        if point_list is not None:
+                            self._map.append(arcade.create_polygon(
+                                    point_list,
+                                    obstacle['color']))
 
         if 'player' in level:
             player_dict = level['player']
@@ -330,15 +352,14 @@ class GameView(arcade.View):
 
         self._npcs = []
         if 'npc' in level:
-            npc_list = level['npc']
-            for npc_dict in npc_list:
+            for npc_dict in level['npc']:
                 if 'quantity' in npc_dict:
                     num = npc_dict['quantity']
                     if 'area' in npc_dict:
                         area = npc_dict['area']
                         for _ in range(num):
-                            x = random.randrange(area[0], area[1])
-                            y = random.randrange(area[2], area[3])
+                            x = random.randrange(area[0], area[2])
+                            y = random.randrange(area[1], area[3])
                             self._npcs.append(NPC(x, y, area))
 
     def on_draw(self):
@@ -354,6 +375,7 @@ class GameView(arcade.View):
         # render game stuffs
         arcade.start_render()
         self._background_shape.draw()
+        self._map.draw()
         
         # draw perception lines between player and perceived shapes
         line_list = arcade.ShapeElementList()
