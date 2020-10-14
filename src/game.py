@@ -276,6 +276,14 @@ class GameView(arcade.View):
         #self.window.set_viewport(0, width, 0, height)
 
     def setup(self):
+        self._background_shape = arcade.ShapeElementList()
+        color1 = (5,10,5)
+        color2 = (10,20,10)
+        points = (0, 0), (SCREEN_WIDTH, 0), (SCREEN_WIDTH, SCREEN_HEIGHT), (0, SCREEN_HEIGHT)
+        colors = (color1, color1, color2, color2)
+        rect = arcade.create_rectangle_filled_with_colors(points, colors)
+        self._background_shape.append(rect)
+        # create characters        
         x = SCREEN_WIDTH/2 #random.randrange(50, SCREEN_WIDTH-50)
         y = SCREEN_HEIGHT/2 #random.randrange(50, SCREEN_HEIGHT-50)
         self._player = Player(x, y)
@@ -297,7 +305,8 @@ class GameView(arcade.View):
 
         # render game stuffs
         arcade.start_render()
-
+        self._background_shape.draw()
+        
         # draw perception lines between player and perceived shapes
         line_list = arcade.ShapeElementList()
         for (npc, squared_dist) in self._neighbours:
@@ -385,27 +394,25 @@ class GameView(arcade.View):
 
 class MenuView(arcade.View):
 
-    #def __init__(self):
-    #    self._alpha = 0
-
     def on_show(self):
-        self._alpha_delta = 2
-        self._title_color = [180, 230, 180, 0] 
-        self._count_frame = 0
-        self._blink = False
-        self._shapes = arcade.ShapeElementList()
+        self._background_shape = arcade.ShapeElementList()
         color1 = (5,10,5)
         color2 = (10,20,10)
         points = (0, 0), (SCREEN_WIDTH, 0), (SCREEN_WIDTH, SCREEN_HEIGHT), (0, SCREEN_HEIGHT)
         colors = (color1, color1, color2, color2)
         rect = arcade.create_rectangle_filled_with_colors(points, colors)
-        self._shapes.append(rect)
+        self._background_shape.append(rect)
+        #
+        self._alpha_delta = 2
+        self._title_color = [180, 230, 180, 0] 
+        self._count_frame = 0
+        self._blink = False
     
     def on_update(self, delta_time):
         self._count_frame += 1
-        if self._count_frame % 20 == 0:
-            self._blink = not self._blink
         self._title_color[3] = 255 if self._title_color[3] >= 255 else self._title_color[3] + self._alpha_delta
+        if self._title_color[3] > 200 and self._count_frame % 20 == 0:
+            self._blink = not self._blink
 
     def on_key_press(self, key, modifiers):
         if key == arcade.key.ESCAPE:
@@ -413,13 +420,14 @@ class MenuView(arcade.View):
 
     def on_draw(self):
         arcade.start_render()
-        self._shapes.draw()
+        self._background_shape.draw()
+
         arcade.draw_text(
-            "Biomorph game\n", 
+            "A Biomorph little game :-)\n", 
             SCREEN_WIDTH/2, 
-            SCREEN_HEIGHT/2 + 60, 
+            SCREEN_HEIGHT/2 + 75, 
             self._title_color, 
-            font_size=60,
+            font_size=40,
             anchor_x="center",
             anchor_y="center")
 
