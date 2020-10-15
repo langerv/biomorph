@@ -84,17 +84,24 @@ class Guard(Npc):
         self._shape = Rectangle(x, y, 0, self._size, self._size, self._color)
 
     def update(self, delta_time):
-        self._shape._x += self._dx
-        self._shape._y += self._dy
-        self._shape._angle = math.atan2(self._dy, self._dx) * RAD2DEG
-        if self._shape._x < self._area[0] and self._dx < 0:
-            self._dx *= -1
-        if self._shape._x > self._area[2] and self._dx > 0:
-            self._dx *= -1
-        if self._shape._y < self._area[1] and self._dy < 0:
-            self._dy *= -1
-        if self._shape._y > self._area[3] and self._dy > 0:
-            self._dy *= -1
+        if self._hit is True:
+            # if a npc is hit, we compute time before to get it back to life
+            self._hit_time += delta_time
+            if int(self._hit_time) % 60 > HIT_TIMER:
+                self._hit_time = 0
+                self._hit = False
+        else:
+            self._shape._x += self._dx
+            self._shape._y += self._dy
+            self._shape._angle = math.atan2(self._dy, self._dx) * RAD2DEG
+            if self._shape._x < self._area[0] and self._dx < 0:
+                self._dx *= -1
+            if self._shape._x > self._area[2] and self._dx > 0:
+                self._dx *= -1
+            if self._shape._y < self._area[1] and self._dy < 0:
+                self._dy *= -1
+            if self._shape._y > self._area[3] and self._dy > 0:
+                self._dy *= -1
 
 
 '''

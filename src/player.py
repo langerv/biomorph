@@ -20,11 +20,12 @@ Shape creation:
 
 class Player(Biomorph, GameObject):
 
-    def __init__(self, x, y, width, height):
+    def __init__(self, x, y, width, height, obstacles):
         Biomorph.__init__(self)
         GameObject.__init__(self, x, y)
         self._width = width
         self._height = height
+        self._obstacles = obstacles
         self._goal = None
         self._morph_target = None
         self._hue = 0
@@ -79,6 +80,17 @@ class Player(Biomorph, GameObject):
     def Target(self, target):
         self._morph_target = target
 
+    def move(self, dx, dy):
+        new_x = self._shape._x + dx
+        new_y = self._shape._y + dy
+        offset = self._size/2
+        for (x, y, width, height) in self._obstacles:
+            if new_x > x - offset and new_x < x + width + offset and new_y > y - offset and new_y < y + height + offset:
+                return False
+        self._shape._x = new_x
+        self._shape._y = new_y
+        return True
+
     def update(self, delta_time):
         Biomorph.update(self)
 
@@ -99,9 +111,9 @@ class Player(Biomorph, GameObject):
             dy = y - self._shape._y
             dist = math.sqrt(dx**2+dy**2)
             if dist >= self._delta:
-                # move
-                self._shape._x += self._dx * dx/dist
-                self._shape._y += self._dy * dy/dist
+                if self.move(self._dx * dx/dist, self._dy * dy/dist) is False:
+                    # we collided then stop
+                    self._goal = None
             else:
                 # we arrived
                 self._shape._x = x

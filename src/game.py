@@ -47,7 +47,7 @@ LEVEL_2 = {
         'obstacles' : [
             {
                 'color':arcade.color.BLUE_GREEN,
-                'rectangle':(0,450,300,50)
+                'rectangle':(0,450,300,50) # (x, y, width, height)
             },
             {
                 'color':arcade.color.BLUE_GREEN,
@@ -66,7 +66,7 @@ LEVEL_2 = {
         {
             'class': NpcType.Guard,
             'quantity':1,
-            'area':(350,450,450,500)}
+            'area':(350,470,450,520)}
     ]
 }
 
@@ -116,11 +116,11 @@ class GameView(arcade.View):
                             point_list = [
                                 (x, y), # xmin, ymin
                                 (x+width, y), #xmax, ymin
-                                (x+width, y-height), #xmax, ymax
-                                (x, y-height)] #xmin, ymax
+                                (x+width, y+height), #xmax, ymax
+                                (x, y+height)] #xmin, ymax
 
                         if point_list is not None:
-                            self._obstacles.append(point_list)
+                            self._obstacles.append((x, y, width, height))
                             self._map.append(arcade.create_polygon(
                                     point_list,
                                     obstacle['color']))
@@ -129,10 +129,10 @@ class GameView(arcade.View):
             player_dict = level['player']
             if 'pos' in player_dict:
                 pos = player_dict['pos']
-                self._player = Player(pos[0], pos[1], SCREEN_WIDTH, SCREEN_HEIGHT)
+                self._player = Player(pos[0], pos[1], SCREEN_WIDTH, SCREEN_HEIGHT, self._obstacles)
             else:
                 # we need a player so by default position is the center of the screen
-                self._player = Player(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, SCREEN_WIDTH, SCREEN_HEIGHT)
+                self._player = Player(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, SCREEN_WIDTH, SCREEN_HEIGHT, self._obstacles)
 
         self._npcs = []
         if 'npc' in level:
