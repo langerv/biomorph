@@ -54,6 +54,5 @@ class GameObject(abc.ABC):
         pass
 
     def draw(self):
-        if self._shape is not None:
-            self._shape.draw()
+        self._shape.draw()
         

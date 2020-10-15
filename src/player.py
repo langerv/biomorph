@@ -27,6 +27,7 @@ class Player(Biomorph, GameObject):
         self._height = height
         self._goal = None
         self._morph_target = None
+        self._hue = 0
 
         # define aptitudes
         self.set_aptitude(PhysicalAptitudes.PERC, 1)
@@ -42,19 +43,18 @@ class Player(Biomorph, GameObject):
         self.size_rule = lambda a : GameObject.MIN_SHAPE_SIZE + self.get_aptitude(a).Value**2 
         self.color_rule = lambda a, b :  self.HLS_to_Color(
             self._hue, # H
-            self.get_aptitude(a).Value / 5, # L
-            self.get_aptitude(b).Value / 5) # S
+            self.get_aptitude(a).Value / 10, # L max is 0.5
+            self.get_aptitude(b).Value / 5) # S max is 1.0
 
-        # compute their values
+        # compute Player attributes
         self._vision = self.vision_rule(PhysicalAptitudes.PERC)
         self._dx = self._dy = self.speed_rule(PhysicalAptitudes.MOVE)
         self._delta = self.Delta_Speed
         self._size = self.size_rule(PhysicalAptitudes.CONS)
-        self._hue = 0
         self._color = self.color_rule(PsychicalAptitudes.INTL, PsychicalAptitudes.CHAR)
 
         # create shape
-        self._shape = Ellipse(x, y, 0, self._size/2, self._size/2, self._color)
+        self._shape = Ellipse(x, y, 0, self._size, self._size, self._color)
 
     def __str__(self):
         return '    '.join([f"{key.name} = {ap.Value:0.1f}" for key, ap in self.Aptitudes.items()])

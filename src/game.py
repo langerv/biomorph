@@ -5,7 +5,8 @@ import random
 from shape import Rectangle, Ellipse
 from game_object import GameObject
 from player import Player
-from npc import Wanderer
+from npc import Wanderer, Guard, NpcType
+
 
 # --- Constants ---
 SCREEN_WIDTH =  800
@@ -32,6 +33,7 @@ LEVEL_1 = {
         },
     'npc' : [
         {
+            'class': NpcType.Wanderer,
             'quantity':30, 
             'area':(WORLD_XMIN, WORLD_YMIN, WORLD_XMAX, WORLD_YMAX)}
     ]
@@ -58,17 +60,19 @@ LEVEL_2 = {
         },
     'npc' : [
         {
-            'quantity':10, 
+            'class': NpcType.Wanderer,
+            'quantity':30, 
             'area':(WORLD_XMIN, WORLD_YMIN, WORLD_XMAX, SCREEN_HEIGHT/2)},
         {
+            'class': NpcType.Guard,
             'quantity':1,
-            'area':(350,400,450,500)}
+            'area':(350,450,450,500)}
     ]
 }
 
 
 '''
-GameView class: main gameplay screen
+GameView: gameplay screen
 '''
 
 class GameView(arcade.View):
@@ -133,14 +137,19 @@ class GameView(arcade.View):
         self._npcs = []
         if 'npc' in level:
             for npc_dict in level['npc']:
-                if 'quantity' in npc_dict:
-                    num = npc_dict['quantity']
-                    if 'area' in npc_dict:
-                        area = npc_dict['area']
-                        for _ in range(num):
-                            x = random.randrange(area[0], area[2])
-                            y = random.randrange(area[1], area[3])
-                            self._npcs.append(Wanderer(x, y, area))
+                if 'class' in npc_dict:
+                    npc_class = npc_dict['class']
+                    if 'quantity' in npc_dict:
+                        num = npc_dict['quantity']
+                        if 'area' in npc_dict:
+                            area = npc_dict['area']
+                            for _ in range(num):
+                                x = random.randrange(area[0], area[2])
+                                y = random.randrange(area[1], area[3])
+                                if npc_class == NpcType.Wanderer:
+                                    self._npcs.append(Wanderer(x, y, area))
+                                elif npc_class == NpcType.Guard:
+                                    self._npcs.append(Guard(x, y, area))
 
     def on_draw(self):
         # Start timing how long this takes and count frames
@@ -242,6 +251,10 @@ class GameView(arcade.View):
         self._processing_time = timeit.default_timer() - start_time
 
 
+'''
+MenuView screen
+'''
+
 class MenuView(arcade.View):
 
     def on_show(self):
@@ -291,7 +304,7 @@ class MenuView(arcade.View):
 
     def on_mouse_press(self, _x, _y, _button, _modifiers):
         start_view = GameView()
-        start_view.setup(LEVEL_1)
+        start_view.setup(LEVEL_2)
         self.window.show_view(start_view)
 
 '''
