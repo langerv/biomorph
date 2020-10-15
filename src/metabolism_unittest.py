@@ -1,7 +1,4 @@
 import unittest
-#import time
-#from datetime import timedelta
-#from timer import Timer
 from metabolism import Metabolism
 import numpy as np
 import matplotlib.pyplot as plt
@@ -50,38 +47,6 @@ class TestMetabolism(unittest.TestCase):
         plt.legend()
         plt.grid(True)
         plt.show()
-
-        '''
-        def move(e):
-            mb.burn(e)
-            print("burning {} energy".format(e))
-
-        def eat(e):
-            mb.ingest(e)
-            print("eating {} energy".format(e))
-
-        def execute():
-            mb.digest()
-            energy.append(mb.Energy)
-            print("Energy = {:.0f}, Stomach = {:.0f}, Capacity = {:.1f}, Hungry = {}".format(
-                mb.Energy, 
-                mb.Stomach, 
-                mb.Capacity,
-                mb.Hungry))
-
-        timer = Timer()
-        timer.add_task(interval=timedelta(seconds=MB_TICK), execute=execute)
-        timer.add_task(interval=timedelta(seconds=MB_FOOD_TICK), execute=eat, e=MB_EFOOD)
-        timer.add_task(interval=timedelta(seconds=MB_MOVE_TICK), execute=move, e=MB_EMOVE)
-        timer.start()
-
-        while True:
-            try:
-                time.sleep(1)
-            except KeyboardInterrupt:
-                timer.stop()
-                break
-        '''
 
 if __name__ == '__main__':
 	unittest.main()
