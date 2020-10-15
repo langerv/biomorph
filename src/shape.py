@@ -30,14 +30,20 @@ class Rectangle(Shape):
 
 
 class Ellipse(Shape):
-    def __init__(self, x, y, angle, width, height, color):
+    def __init__(self, x, y, angle, width, height, color, outline_color=None):
         super().__init__(x, y, angle, width, height, color)
-        shape = arcade.create_ellipse_filled(
+        self._shape_list = arcade.ShapeElementList()
+        self._shape_list.append(arcade.create_ellipse_filled(
             0, 0, 
             self._width, 
             self._height, 
             self._color, 
-            self._angle)
-        self._shape_list = arcade.ShapeElementList()
-        self._shape_list.append(shape)
+            self._angle))
+        if outline_color is not None:
+            self._shape_list.append(arcade.create_ellipse_outline(
+                0, 0, 
+                self._width, 
+                self._height,
+                outline_color))
+
 

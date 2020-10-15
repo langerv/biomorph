@@ -1,4 +1,5 @@
 import math
+import arcade
 from shape import Ellipse
 from game_object import GameObject
 from biomorph import Biomorph
@@ -53,9 +54,10 @@ class Player(Biomorph, GameObject):
         self._delta = self.Delta_Speed
         self._size = self.size_rule(PhysicalAptitudes.CONS)
         self._color = self.color_rule(PsychicalAptitudes.INTL, PsychicalAptitudes.CHAR)
+        self._outline_color =arcade.color.BRANDEIS_BLUE
 
         # create shape
-        self._shape = Ellipse(x, y, 0, self._size, self._size, self._color)
+        self._shape = Ellipse(x, y, 0, self._size/2, self._size/2, self._color, self._outline_color)
 
     def __str__(self):
         return '    '.join([f"{key.name} = {ap.Value:0.1f}" for key, ap in self.Aptitudes.items()])
@@ -83,7 +85,7 @@ class Player(Biomorph, GameObject):
     def move(self, dx, dy):
         new_x = self._shape._x + dx
         new_y = self._shape._y + dy
-        offset = self._size/2
+        offset = self._size
         for (x, y, width, height) in self._obstacles:
             if new_x > x - offset and new_x < x + width + offset and new_y > y - offset and new_y < y + height + offset:
                 return False
@@ -102,7 +104,7 @@ class Player(Biomorph, GameObject):
             self._delta = self.Delta_Speed
         self._size = self.size_rule(PhysicalAptitudes.CONS)
         self._color = self.color_rule(PsychicalAptitudes.INTL, PsychicalAptitudes.CHAR)
-        self._shape = Ellipse(self._shape._x, self._shape._y, 0, self._size/2, self._size/2, self._color)
+        self._shape = Ellipse(self._shape._x, self._shape._y, 0, self._size/2, self._size/2, self._color, self._outline_color)
 
         # Move to Goal
         if self._goal is not None:
