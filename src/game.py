@@ -5,7 +5,7 @@ import random
 from shape import Rectangle, Ellipse
 from game_object import GameObject
 from player import Player
-from npc import Wanderer, Guard, NpcType
+from npc import Npc, Wanderer, Guard
 
 
 # --- Constants ---
@@ -33,7 +33,7 @@ LEVEL_1 = {
         },
     'npc' : [
         {
-            'class': NpcType.Wanderer,
+            'class': Npc.type.Wanderer,
             'quantity':30, 
             'area':(WORLD_XMIN, WORLD_YMIN, WORLD_XMAX, WORLD_YMAX)}
     ]
@@ -60,11 +60,11 @@ LEVEL_2 = {
         },
     'npc' : [
         {
-            'class': NpcType.Wanderer,
+            'class': Npc.type.Wanderer,
             'quantity':30, 
-            'area':(WORLD_XMIN, WORLD_YMIN, WORLD_XMAX, SCREEN_HEIGHT/2)},
+            'area':(WORLD_XMIN, WORLD_YMIN, WORLD_XMAX, 400)},
         {
-            'class': NpcType.Guard,
+            'class': Npc.type.Guard,
             'quantity':1,
             'area':(330,470,470,520)}
     ]
@@ -146,9 +146,9 @@ class GameView(arcade.View):
                             for _ in range(num):
                                 x = random.randrange(area[0], area[2])
                                 y = random.randrange(area[1], area[3])
-                                if npc_class == NpcType.Wanderer:
+                                if npc_class == Npc.type.Wanderer:
                                     self._npcs.append(Wanderer(x, y, area))
-                                elif npc_class == NpcType.Guard:
+                                elif npc_class == Npc.type.Guard:
                                     self._npcs.append(Guard(x, y, area))
 
     def on_draw(self):

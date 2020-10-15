@@ -7,18 +7,20 @@ from game_object import GameObject
 from character import Character
 from aptitude import PhysicalAptitudes, PsychicalAptitudes
 
-HIT_TIMER = 5 # number of seconds before a hit npc goes back to life
 RAD2DEG = 180 / math.pi
 
-class NpcType(Enum):
-    Wanderer = auto()
-    Guard = auto()
 
 '''
 NPC class
 '''
 
 class Npc(Character, GameObject):
+
+    HIT_TIMER = 5 # number of seconds before a hit npc goes back to life
+
+    class type(Enum):
+        Wanderer = auto()
+        Guard = auto()
 
     def __init__(self, x, y, area):
         Character.__init__(self)
@@ -53,18 +55,12 @@ class Npc(Character, GameObject):
     def Hit(self, value):
         self._hit = value
 
-    def move(self):
-        self._shape._x += self._dx
-        self._shape._y += self._dy
-        self._shape._angle = math.atan2(self._dy, self._dx) * RAD2DEG
-        if self._shape._x < self._area[0] and self._dx < 0:
-            self._dx *= -1
-        if self._shape._x > self._area[2] and self._dx > 0:
-            self._dx *= -1
-        if self._shape._y < self._area[1] and self._dy < 0:
-            self._dy *= -1
-        if self._shape._y > self._area[3] and self._dy > 0:
-            self._dy *= -1
+    def move(self, dx, dy):
+        self._shape._x += dx
+        self._shape._y += dy
+        self._shape._angle = math.atan2(dy, dx) * RAD2DEG
+        return True
+
 
 '''
 Class Guard (NPC)
@@ -104,15 +100,27 @@ class Guard(Npc):
     def update(self, delta_time):
         if self._hit is True:
             self._hit = False
-        # little FSM
+
+        # Guard FSM
         if self._state == Guard.state.idle:
             self._state = Guard.state.patrol
+
         elif self._state == Guard.state.patrol:
             # patrol
-            self.move()
+            if self._shape._x < self._area[0] and self._dx < 0:
+                self._dx *= -1
+            if self._shape._x > self._area[2] and self._dx > 0:
+                self._dx *= -1
+            if self._shape._y < self._area[1] and self._dy < 0:
+                self._dy *= -1
+            if self._shape._y > self._area[3] and self._dy > 0:
+                self._dy *= -1
+            self.move(self._dx, self._dy)
+
         elif self._state == Guard.state.attack:
             # attack
             pass
+
 
 '''
 Class Wanderer (NPC)
@@ -142,9 +150,17 @@ class Wanderer(Npc):
         if self._hit is True:
             # if a npc is hit, we compute time before to get it back to life
             self._hit_time += delta_time
-            if int(self._hit_time) % 60 > HIT_TIMER:
+            if int(self._hit_time) % 60 > Npc.HIT_TIMER:
                 self._hit_time = 0
                 self._hit = False
         else:
             # wander
-            self.move()
+            if self._shape._x < self._area[0] and self._dx < 0:
+                self._dx *= -1
+            if self._shape._x > self._area[2] and self._dx > 0:
+                self._dx *= -1
+            if self._shape._y < self._area[1] and self._dy < 0:
+                self._dy *= -1
+            if self._shape._y > self._area[3] and self._dy > 0:
+                self._dy *= -1
+            self.move(self._dx, self._dy)
