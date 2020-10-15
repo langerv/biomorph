@@ -85,7 +85,7 @@ class Player(Biomorph, GameObject):
     def move(self, dx, dy):
         new_x = self._shape._x + dx
         new_y = self._shape._y + dy
-        offset = self._size
+        offset = self._size/2
         for (x, y, width, height) in self._obstacles:
             if new_x > x - offset and new_x < x + width + offset and new_y > y - offset and new_y < y + height + offset:
                 return False

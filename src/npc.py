@@ -53,6 +53,18 @@ class Npc(Character, GameObject):
     def Hit(self, value):
         self._hit = value
 
+    def move(self):
+        self._shape._x += self._dx
+        self._shape._y += self._dy
+        self._shape._angle = math.atan2(self._dy, self._dx) * RAD2DEG
+        if self._shape._x < self._area[0] and self._dx < 0:
+            self._dx *= -1
+        if self._shape._x > self._area[2] and self._dx > 0:
+            self._dx *= -1
+        if self._shape._y < self._area[1] and self._dy < 0:
+            self._dy *= -1
+        if self._shape._y > self._area[3] and self._dy > 0:
+            self._dy *= -1
 
 '''
 Class Guard (NPC)
@@ -61,8 +73,14 @@ Behaviour:
 
 class Guard(Npc):
 
+    class state(Enum):
+        idle = auto()
+        patrol = auto()
+        attack = auto()
+
     def __init__(self, x, y, area):
         Npc.__init__(self, x, y, area)
+        self._state = Guard.state.idle
         # design Guard aptitudes
         self.set_aptitude(PhysicalAptitudes.PERC, 3)
         self.set_aptitude(PhysicalAptitudes.MOVE, 3)
@@ -85,25 +103,16 @@ class Guard(Npc):
 
     def update(self, delta_time):
         if self._hit is True:
-            # if a npc is hit, we compute time before to get it back to life
-            self._hit_time += delta_time
-            if int(self._hit_time) % 60 > HIT_TIMER:
-                self._hit_time = 0
-                self._hit = False
-        else:
+            self._hit = False
+        # little FSM
+        if self._state == Guard.state.idle:
+            self._state = Guard.state.patrol
+        elif self._state == Guard.state.patrol:
             # patrol
-            self._shape._x += self._dx
-            self._shape._y += self._dy
-            self._shape._angle = math.atan2(self._dy, self._dx) * RAD2DEG
-            if self._shape._x < self._area[0] and self._dx < 0:
-                self._dx *= -1
-            if self._shape._x > self._area[2] and self._dx > 0:
-                self._dx *= -1
-            if self._shape._y < self._area[1] and self._dy < 0:
-                self._dy *= -1
-            if self._shape._y > self._area[3] and self._dy > 0:
-                self._dy *= -1
-
+            self.move()
+        elif self._state == Guard.state.attack:
+            # attack
+            pass
 
 '''
 Class Wanderer (NPC)
@@ -138,14 +147,4 @@ class Wanderer(Npc):
                 self._hit = False
         else:
             # wander
-            self._shape._x += self._dx
-            self._shape._y += self._dy
-            self._shape._angle = math.atan2(self._dy, self._dx) * RAD2DEG
-            if self._shape._x < self._area[0] and self._dx < 0:
-                self._dx *= -1
-            if self._shape._x > self._area[2] and self._dx > 0:
-                self._dx *= -1
-            if self._shape._y < self._area[1] and self._dy < 0:
-                self._dy *= -1
-            if self._shape._y > self._area[3] and self._dy > 0:
-                self._dy *= -1
+            self.move()
