@@ -64,8 +64,8 @@ class Guard(Npc):
     def __init__(self, x, y, area):
         Npc.__init__(self, x, y, area)
         # design Guard aptitudes
-        self.set_aptitude(PhysicalAptitudes.PERC, 4)
-        self.set_aptitude(PhysicalAptitudes.MOVE, 4)
+        self.set_aptitude(PhysicalAptitudes.PERC, 3)
+        self.set_aptitude(PhysicalAptitudes.MOVE, 3)
         self.set_aptitude(PhysicalAptitudes.CONS, 5)
         self.set_aptitude(PsychicalAptitudes.INTL, 2)
         self.set_aptitude(PsychicalAptitudes.CHAR, 2)
@@ -91,6 +91,7 @@ class Guard(Npc):
                 self._hit_time = 0
                 self._hit = False
         else:
+            # patrol
             self._shape._x += self._dx
             self._shape._y += self._dy
             self._shape._angle = math.atan2(self._dy, self._dx) * RAD2DEG

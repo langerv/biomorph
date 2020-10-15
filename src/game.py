@@ -66,7 +66,7 @@ LEVEL_2 = {
         {
             'class': NpcType.Guard,
             'quantity':1,
-            'area':(350,470,450,520)}
+            'area':(330,470,470,520)}
     ]
 }
 
