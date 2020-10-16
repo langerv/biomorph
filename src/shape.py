@@ -21,13 +21,13 @@ class Arrow(Shape):
     def __init__(self, x, y, angle, width, height, color):
         super().__init__(x, y, angle, width, height, color)
         point_list = (
-            (0, 0.1*height),
-            (0.7*width, 0.1*height),
-            (0.7*width, 0.2*height),
-            (width, 0),
-            (0.7*width, -0.2*height),
-            (0.7*width, -0.1*height),
-            (0, -0.1*height)
+            (-0.5*width, 0.25*height),
+            (0.5*width, 0.25*height),
+            (0.5*width,  0.5*height),
+            (1.0*width, 0),
+            (0.5*width, -0.5*height),
+            (0.5*width, -0.25*height),
+            (-0.5*width, -0.25*height)
         )
         self._shape_list = arcade.ShapeElementList()
         self._shape_list.append(arcade.create_polygon(

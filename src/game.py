@@ -91,8 +91,11 @@ class GameView(arcade.View):
         self._buttons = []
 
     def setup(self, level):
+        # level
         self._level_name = level['name'] if 'name' in level else ""
         self._background_shape = arcade.ShapeElementList()
+
+        # load map
         self._map = arcade.ShapeElementList()
         self._obstacles = []
         if 'map' in level:
@@ -124,6 +127,7 @@ class GameView(arcade.View):
                                     point_list,
                                     obstacle['color']))
 
+        # load player
         if 'player' in level:
             player_dict = level['player']
             if 'pos' in player_dict:
@@ -132,7 +136,8 @@ class GameView(arcade.View):
             else:
                 # we need a player so by default position is the center of the screen
                 self._player = Player(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, SCREEN_WIDTH, SCREEN_HEIGHT, self._obstacles)
-        
+
+        # load npcs        
         self._npcs = []
         if 'npc' in level:
             for npc_dict in level['npc']:
@@ -150,12 +155,12 @@ class GameView(arcade.View):
                                 elif npc_class == Npc.type.Guard:
                                     self._npcs.append(Guard(x, y, area))
 
-        # buttons
+        # add buttons and flow
         self._buttons.append(
-            ArrowButton("Next", 730, 570, 60, 100, arcade.color.ORANGE_PEEL, ArrowButton.direction.right)
+            ArrowButton("Next", 750, 560, 30, 30, arcade.color.ORANGE_PEEL, ArrowButton.direction.right)
         )
         self._buttons.append(
-            ArrowButton("Previous", 0, 570, 60, 100, arcade.color.ORANGE_PEEL, ArrowButton.direction.left)
+            ArrowButton("Prev", 20, 560, 30, 30, arcade.color.ORANGE_PEEL, ArrowButton.direction.left)
         )
 
     def on_draw(self):
@@ -242,6 +247,7 @@ class GameView(arcade.View):
                     start_view = GameView()
                     start_view.setup(LEVEL_2)
                     self.window.show_view(start_view)
+                    return
 
             # test if we've hit a npc
             for (npc, _) in self._player_neighbours:
@@ -251,7 +257,8 @@ class GameView(arcade.View):
                         return
                     else:
                         self._player.Target = npc
-            # move player
+
+            # set playe goal
             self._player.Goal = (x, y)
 
     def on_update(self, delta_time):
