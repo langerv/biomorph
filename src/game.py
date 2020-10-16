@@ -6,7 +6,7 @@ from shape import Rectangle, Ellipse
 from game_object import GameObject
 from player import Player
 from npc import Npc, Wanderer, Guard
-
+from button import ArrowButton
 
 # --- Constants ---
 SCREEN_WIDTH =  800
@@ -87,9 +87,8 @@ class GameView(arcade.View):
         self._fps = None
         self._total_time = 0.0        
         self._npcs = None
-        self._neighbours = []
-        #width, height = self.window.get_size()
-        #self.window.set_viewport(0, width, 0, height)
+        self._player_neighbours = []
+        self._buttons = []
 
     def setup(self, level):
         self._level_name = level['name'] if 'name' in level else ""
@@ -133,7 +132,7 @@ class GameView(arcade.View):
             else:
                 # we need a player so by default position is the center of the screen
                 self._player = Player(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, SCREEN_WIDTH, SCREEN_HEIGHT, self._obstacles)
-
+        
         self._npcs = []
         if 'npc' in level:
             for npc_dict in level['npc']:
@@ -150,6 +149,14 @@ class GameView(arcade.View):
                                     self._npcs.append(Wanderer(x, y, area))
                                 elif npc_class == Npc.type.Guard:
                                     self._npcs.append(Guard(x, y, area))
+
+        # buttons
+        self._buttons.append(
+            ArrowButton("Next", 730, 570, 60, 100, arcade.color.ORANGE_PEEL, ArrowButton.direction.right)
+        )
+        self._buttons.append(
+            ArrowButton("Previous", 0, 570, 60, 100, arcade.color.ORANGE_PEEL, ArrowButton.direction.left)
+        )
 
     def on_draw(self):
         # Start timing how long this takes and count frames
@@ -168,7 +175,7 @@ class GameView(arcade.View):
         
         # draw perception lines between player and perceived shapes
         line_list = arcade.ShapeElementList()
-        for (npc, squared_dist) in self._neighbours:
+        for (npc, squared_dist) in self._player_neighbours:
             if squared_dist > 0:
                 line_list.append(arcade.create_line(
                     self._player.X, 
@@ -190,6 +197,10 @@ class GameView(arcade.View):
 
         # render player
         self._player.draw()
+
+        # render buttons
+        for button in self._buttons:
+            button.draw()
 
         # display game infos
         minutes = int(self._total_time) // 60
@@ -220,10 +231,20 @@ class GameView(arcade.View):
         #    self.window.set_fullscreen(not self.window.fullscreen)
         #    self.window.set_viewport(0, SCREEN_WIDTH, 0, SCREEN_HEIGHT)
 
+    def on_mouse_motion(self, x, y, dx, dy):
+        pass
+
     def on_mouse_press(self, x, y, button, modifiers):
         if button == arcade.MOUSE_BUTTON_LEFT:
+            # test buttons
+            for button in self._buttons:
+                if button.is_clicked(x, y) is True:
+                    start_view = GameView()
+                    start_view.setup(LEVEL_2)
+                    self.window.show_view(start_view)
+
             # test if we've hit a npc
-            for (npc, _) in self._neighbours:
+            for (npc, _) in self._player_neighbours:
                  if npc.is_inside(x, y):
                     if npc.Hit is False:
                         npc.Hit = True
@@ -236,7 +257,7 @@ class GameView(arcade.View):
     def on_update(self, delta_time):
         start_time = timeit.default_timer()
         self._player.update(delta_time)
-        self._neighbours = []
+        self._player_neighbours = []
         squared_vision = self._player.Vision**2
         for npc in self._npcs:
             npc.update(delta_time)
@@ -245,7 +266,7 @@ class GameView(arcade.View):
                 dy = npc.Y - self._player.Y
                 squared_dist = dx**2+dy**2
                 if squared_dist < squared_vision: # and only if in range of player's perception
-                    self._neighbours.append((npc, squared_dist))
+                    self._player_neighbours.append((npc, squared_dist))
 
         self._total_time += delta_time
         self._processing_time = timeit.default_timer() - start_time
@@ -304,7 +325,7 @@ class MenuView(arcade.View):
 
     def on_mouse_press(self, _x, _y, _button, _modifiers):
         start_view = GameView()
-        start_view.setup(LEVEL_2)
+        start_view.setup(LEVEL_1)
         self.window.show_view(start_view)
 
 '''

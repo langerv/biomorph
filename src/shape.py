@@ -16,17 +16,38 @@ class Shape():
         self._shape_list.angle = self._angle
         self._shape_list.draw()
 
+
+class Arrow(Shape):
+    def __init__(self, x, y, angle, width, height, color):
+        super().__init__(x, y, angle, width, height, color)
+        point_list = (
+            (0, 0.1*height),
+            (0.7*width, 0.1*height),
+            (0.7*width, 0.2*height),
+            (width, 0),
+            (0.7*width, -0.2*height),
+            (0.7*width, -0.1*height),
+            (0, -0.1*height)
+        )
+        self._shape_list = arcade.ShapeElementList()
+        self._shape_list.append(arcade.create_polygon(
+            point_list, 
+            color)
+        )
+
+
+
 class Rectangle(Shape):
     def __init__(self, x, y, angle, width, height, color):
         super().__init__(x, y, angle, width, height, color)
-        shape = arcade.create_rectangle_filled(
+        self._shape_list = arcade.ShapeElementList()
+        self._shape_list.append(arcade.create_rectangle_filled(
             0, 0, 
             self._width, 
             self._height, 
             self._color, 
             self._angle)
-        self._shape_list = arcade.ShapeElementList()
-        self._shape_list.append(shape)
+        )
 
 
 class Ellipse(Shape):
@@ -38,12 +59,14 @@ class Ellipse(Shape):
             self._width, 
             self._height, 
             self._color, 
-            self._angle))
+            self._angle)
+        )
         if outline_color is not None:
             self._shape_list.append(arcade.create_ellipse_outline(
                 0, 0, 
                 self._width, 
                 self._height,
-                outline_color))
+                outline_color)
+            )
 
 

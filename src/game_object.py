@@ -17,10 +17,6 @@ class GameObject(abc.ABC):
         self._size = 0
         self._shape = None
 
-    def set_shape(self, shape):
-        print(f"shape = {shape}")
-        self._shape = shape
-
     @property
     def X(self):
         return self._shape._x
