@@ -36,7 +36,6 @@ class Arrow(Shape):
         )
 
 
-
 class Rectangle(Shape):
     def __init__(self, x, y, angle, width, height, color):
         super().__init__(x, y, angle, width, height, color)

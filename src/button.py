@@ -23,20 +23,20 @@ class ArrowButton(Button):
         left = auto()
         right = auto()
 
-    def __init__(self, text, x, y, width, height, color, dir, data=None):
+    def __init__(self, text, x, y, width, height, color, direction):
         super().__init__(x, y, width, height)
         self._text = text
-        self._data = data
-        angle = 0
-        if dir == ArrowButton.direction.left:
-            angle = 180
-        x += width/2
+        self._direction = direction
+        # compute the angle
+        angle = 180 if direction == ArrowButton.direction.left else 0
+        # recompute x,y at the center for the shape
+        x += width/2 
         y += height/2
         self._shape = Arrow(x, y, angle, width, height, color)
 
     @property
-    def Data(self):
-        return self._data
+    def Direction(self):
+        return self._direction
 
     def draw(self):
         super().draw()

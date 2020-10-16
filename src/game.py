@@ -10,7 +10,7 @@ from button import ArrowButton
 
 # --- Constants ---
 SCREEN_WIDTH =  800
-SCREEN_HEIGHT = 600
+SCREEN_HEIGHT = 650
 SCREEN_TITLE = "Biomorph game"
 WORLD_WIDTH =  2 * SCREEN_WIDTH
 WORLD_HEIGHT = 2 * SCREEN_HEIGHT
@@ -23,7 +23,7 @@ WORLD_YMAX =  SCREEN_HEIGHT/2 + WORLD_HEIGHT/2
 # --- Game levels ---
 
 LEVEL_1 = {
-    'name': 'level 1',
+    'name': 'Level 1',
     'map': {
         'color1':(5,10,5), 
         'color2':(10,20,10)
@@ -40,18 +40,18 @@ LEVEL_1 = {
 }
 
 LEVEL_2 = {
-    'name': 'level 2',
+    'name': 'Level 2',
     'map' : {
         'color1':(10,5,5), 
         'color2':(20,10,10),
         'obstacles' : [
             {
                 'color':arcade.color.BLUE_GREEN,
-                'rectangle':(0,450,300,50) # (x, y, width, height)
+                'rectangle':(0, SCREEN_HEIGHT - 190, 300, 40) # rectangle is (x, y, width, height)
             },
             {
                 'color':arcade.color.BLUE_GREEN,
-                'rectangle':(500,450,300,50)
+                'rectangle':(SCREEN_WIDTH - 300, SCREEN_HEIGHT - 190, 300, 40)
             }
         ]
     },
@@ -88,12 +88,12 @@ class GameView(arcade.View):
         self._total_time = 0.0        
         self._npcs = None
         self._player_neighbours = []
-        self._buttons = []
 
-    def setup(self, level):
+    def setup(self, level, next_level=None, prev_level=None):
         # level
         self._level_name = level['name'] if 'name' in level else ""
         self._background_shape = arcade.ShapeElementList()
+        self._level = level
 
         # load map
         self._map = arcade.ShapeElementList()
@@ -156,12 +156,16 @@ class GameView(arcade.View):
                                     self._npcs.append(Guard(x, y, area))
 
         # add buttons and flow
-        self._buttons.append(
-            ArrowButton("Next", 750, 560, 30, 30, arcade.color.ORANGE_PEEL, ArrowButton.direction.right)
-        )
-        self._buttons.append(
-            ArrowButton("Prev", 20, 560, 30, 30, arcade.color.ORANGE_PEEL, ArrowButton.direction.left)
-        )
+        self._buttons = []
+        if next_level is not None:
+            self._buttons.append(
+                ArrowButton("Next", SCREEN_WIDTH - 50, SCREEN_HEIGHT - 40, 30, 30, arcade.color.ORANGE_PEEL, ArrowButton.direction.right)
+            )
+
+        if prev_level is not None:
+            self._buttons.append(
+                ArrowButton("Prev", 20, SCREEN_HEIGHT - 40, 30, 30, arcade.color.ORANGE_PEEL, ArrowButton.direction.left)
+            )
 
     def on_draw(self):
         # Start timing how long this takes and count frames
@@ -208,10 +212,11 @@ class GameView(arcade.View):
             button.draw()
 
         # display game infos
+        arcade.draw_text(str(self._level_name), SCREEN_WIDTH/2, SCREEN_HEIGHT - 25, arcade.color.WHITE, 20, anchor_x='center')
         minutes = int(self._total_time) // 60
         seconds = int(self._total_time) % 60
         output = f"Time: {minutes:02d}:{seconds:02d}"
-        arcade.draw_text(output, SCREEN_WIDTH/2, SCREEN_HEIGHT - 35, arcade.color.WHITE, 25, anchor_x='center')
+        arcade.draw_text(output, SCREEN_WIDTH/2, SCREEN_HEIGHT - 55, arcade.color.WHITE, 25, anchor_x='center')
         arcade.draw_text(str(self._player), SCREEN_WIDTH/2, 16, arcade.color.WHITE, 14, anchor_x='center')
 
         # display performance
@@ -244,10 +249,17 @@ class GameView(arcade.View):
             # test buttons
             for button in self._buttons:
                 if button.is_clicked(x, y) is True:
-                    start_view = GameView()
-                    start_view.setup(LEVEL_2)
-                    self.window.show_view(start_view)
-                    return
+                    if button.Direction == ArrowButton.direction.right:
+                        if self._level == LEVEL_1:
+                            start_view = GameView()
+                            start_view.setup(LEVEL_2, None, LEVEL_1)
+                            self.window.show_view(start_view)
+
+                    if button.Direction == ArrowButton.direction.left:
+                        if self._level == LEVEL_2:
+                            start_view = GameView()
+                            start_view.setup(LEVEL_1, LEVEL_2, None)
+                            self.window.show_view(start_view)
 
             # test if we've hit a npc
             for (npc, _) in self._player_neighbours:
@@ -332,7 +344,7 @@ class MenuView(arcade.View):
 
     def on_mouse_press(self, _x, _y, _button, _modifiers):
         start_view = GameView()
-        start_view.setup(LEVEL_1)
+        start_view.setup(LEVEL_1, LEVEL_2)
         self.window.show_view(start_view)
 
 '''
