@@ -66,7 +66,7 @@ LEVEL_2 = {
         {
             'class': Npc.type.Guard,
             'quantity':1,
-            'area':(330,470,470,520)}
+            'area':(330, SCREEN_HEIGHT - 140, 470, SCREEN_HEIGHT - 90)}
     ]
 }
 
@@ -159,12 +159,12 @@ class GameView(arcade.View):
         self._buttons = []
         if next_level is not None:
             self._buttons.append(
-                ArrowButton("Next", SCREEN_WIDTH - 50, SCREEN_HEIGHT - 40, 30, 30, arcade.color.ORANGE_PEEL, ArrowButton.direction.right)
+                ArrowButton("Next", SCREEN_WIDTH - 50, SCREEN_HEIGHT - 40, 30, 35, arcade.color.ORANGE_PEEL, ArrowButton.direction.right)
             )
 
         if prev_level is not None:
             self._buttons.append(
-                ArrowButton("Prev", 20, SCREEN_HEIGHT - 40, 30, 30, arcade.color.ORANGE_PEEL, ArrowButton.direction.left)
+                ArrowButton("Prev", 20, SCREEN_HEIGHT - 40, 30, 35, arcade.color.ORANGE_PEEL, ArrowButton.direction.left)
             )
 
     def on_draw(self):
@@ -242,13 +242,14 @@ class GameView(arcade.View):
         #    self.window.set_viewport(0, SCREEN_WIDTH, 0, SCREEN_HEIGHT)
 
     def on_mouse_motion(self, x, y, dx, dy):
-        pass
+            for button in self._buttons:
+                button.hover(x, y)
 
     def on_mouse_press(self, x, y, button, modifiers):
         if button == arcade.MOUSE_BUTTON_LEFT:
             # test buttons
             for button in self._buttons:
-                if button.is_clicked(x, y) is True:
+                if button.is_inside(x, y) is True:
                     if button.Direction == ArrowButton.direction.right:
                         if self._level == LEVEL_1:
                             start_view = GameView()
