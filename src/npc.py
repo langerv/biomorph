@@ -7,7 +7,6 @@ from game_object import GameObject
 from character import Character
 from aptitude import PhysicalAptitudes, PsychicalAptitudes
 
-RAD2DEG = 180 / math.pi
 
 
 '''
@@ -58,7 +57,7 @@ class Npc(Character, GameObject):
     def move(self, dx, dy):
         self._shape._x += dx
         self._shape._y += dy
-        self._shape._angle = math.atan2(dy, dx) * RAD2DEG
+        self._shape._angle = math.atan2(dy, dx) * GameObject.RAD2DEG
         return True
 
 
@@ -100,7 +99,6 @@ class Guard(Npc):
         self._shape = Rectangle(x, y, 0, self._size, self._size, self._color)
 
     def update(self, neighbours, delta_time):
-
         # perception
         closest = self._vision
         for neighbour in neighbours:

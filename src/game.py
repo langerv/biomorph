@@ -66,7 +66,7 @@ LEVEL_2 = {
         {
             'class': Npc.type.Guard,
             'quantity':1,
-            'area':(330, SCREEN_HEIGHT - 140, 470, SCREEN_HEIGHT - 90)}
+            'area':(330, SCREEN_HEIGHT - 145, 470, SCREEN_HEIGHT - 95)}
     ]
 }
 

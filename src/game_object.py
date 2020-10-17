@@ -8,6 +8,7 @@ GameObject class
 
 class GameObject(abc.ABC):
 
+    RAD2DEG = 180 / math.pi
     MIN_SHAPE_SIZE = 20
 
     def __init__(self, x, y):
