@@ -5,7 +5,9 @@ import random
 from shape import Rectangle, Ellipse
 from game_object import GameObject
 from player import Player
-from npc import Npc, Wanderer, Guard
+from npc import Npc
+from wanderer import Wanderer
+from guard import Guard
 from button import ArrowButton, ButtonType
 
 # --- Constants ---
