@@ -72,11 +72,13 @@ class Guard(Npc):
     class state(Enum):
         idle = auto()
         patrol = auto()
+        watch = auto()
         attack = auto()
 
     def __init__(self, x, y, area):
         Npc.__init__(self, x, y, area)
         self._state = Guard.state.idle
+        self._closest_target = None
         # design Guard aptitudes
         self.set_aptitude(PhysicalAptitudes.PERC, 3)
         self.set_aptitude(PhysicalAptitudes.MOVE, 3)
@@ -97,29 +99,50 @@ class Guard(Npc):
         # create shape
         self._shape = Rectangle(x, y, 0, self._size, self._size, self._color)
 
-    def update(self, delta_time):
-        if self._hit is True:
-            self._hit = False
+    def update(self, neighbours, delta_time):
 
-        # Guard FSM
+        # perception
+        closest = self._vision
+        for neighbour in neighbours:
+            dx = neighbour.X - self._shape._x
+            dy = neighbour.Y - self._shape._y
+            dist = math.sqrt(dx**2 + dy**2)
+            if dist < closest:
+                self._closest_target = neighbour
+                closest = dist
+
+        # action: Guard FSM
         if self._state == Guard.state.idle:
             self._state = Guard.state.patrol
 
         elif self._state == Guard.state.patrol:
-            # patrol
-            if self._shape._x < self._area[0] and self._dx < 0:
-                self._dx *= -1
-            if self._shape._x > self._area[2] and self._dx > 0:
-                self._dx *= -1
-            if self._shape._y < self._area[1] and self._dy < 0:
-                self._dy *= -1
-            if self._shape._y > self._area[3] and self._dy > 0:
-                self._dy *= -1
-            self.move(self._dx, self._dy)
+            if closest < self._vision:
+                self._state = Guard.state.watch
+            else:
+                # patrol
+                if self._shape._x < self._area[0] and self._dx < 0:
+                    self._dx *= -1
+                if self._shape._x > self._area[2] and self._dx > 0:
+                    self._dx *= -1
+                if self._shape._y < self._area[1] and self._dy < 0:
+                    self._dy *= -1
+                if self._shape._y > self._area[3] and self._dy > 0:
+                    self._dy *= -1
+                self.move(self._dx, self._dy)
+
+        elif self._state == Guard.state.watch:
+            # watch
+            print(f"{self._state}")
+            if closest >= self._vision:
+                self._state = Guard.state.patrol
+            elif closest < self._vision/2:
+                self._state = Guard.state.attack
 
         elif self._state == Guard.state.attack:
             # attack
-            pass
+            print(f"{self._state}")
+            if closest >= self._vision/2:
+                self._state = Guard.state.watch
 
 
 '''
@@ -146,7 +169,7 @@ class Wanderer(Npc):
         # create shape
         self._shape = Rectangle(x, y, 0, self._size, self._size, self._color)
  
-    def update(self, delta_time):
+    def update(self, neighbours, delta_time):
         if self._hit is True:
             # if a npc is hit, we compute time before to get it back to life
             self._hit_time += delta_time

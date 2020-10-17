@@ -277,8 +277,7 @@ class GameView(arcade.View):
                         start_view = GameView()
                         start_view.setup(LEVEL_2, None, LEVEL_1)
                         self.window.show_view(start_view)
-
-                if self._button_hover.Type == ButtonType.arrow_left:
+                elif self._button_hover.Type == ButtonType.arrow_left:
                     if self._level == LEVEL_2:
                         start_view = GameView()
                         start_view.setup(LEVEL_1, LEVEL_2, None)
@@ -302,7 +301,7 @@ class GameView(arcade.View):
         self._player_neighbours = []
         squared_vision = self._player.Vision**2
         for npc in self._npcs:
-            npc.update(delta_time)
+            npc.update([self._player], delta_time)
             if npc.X > 0 and npc.Y < SCREEN_WIDTH and npc.Y > 0 and npc.Y < SCREEN_HEIGHT: # cannot be perceived outside of screen  boundaries
                 dx = npc.X - self._player.X
                 dy = npc.Y - self._player.Y
