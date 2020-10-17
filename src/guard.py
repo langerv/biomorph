@@ -49,14 +49,13 @@ class Guard(Npc):
 
     def update(self, neighbours, delta_time):
 
-        # perception
+        # perception: find closest neighbour
         target = None
         target_dist = self._vision
-        target_dx = target_dx = 0
         for neighbour in neighbours:
-            target_dx = neighbour.X - self._shape._x
-            target_dy = neighbour.Y - self._shape._y
-            dist = math.sqrt(target_dx**2 + target_dy**2)
+            dx = neighbour.X - self._shape._x
+            dy = neighbour.Y - self._shape._y
+            dist = math.sqrt(dx**2 + dy**2)
             if dist < target_dist:
                 target = neighbour
                 target_dist = dist
@@ -91,13 +90,6 @@ class Guard(Npc):
                 else:
                     # guard not in area, go to center of the area first
                     self.move_to(self._center_x, self._center_y)
-                    '''
-                    dx = self._center_x - self._shape._x
-                    dy = self._center_y - self._shape._y
-                    dist = math.sqrt(dx**2+dy**2)
-                    if dist >= self._delta:
-                        self.move(self._dx * dx/dist, self._dy * dy/dist)
-                    '''
 
             elif target_dist < self._vision/2:
                 # target too close, attack!
@@ -113,7 +105,8 @@ class Guard(Npc):
             else:
                 # move towards target
                 if target_dist >= self._delta:
-                    self.move(self._dx * target_dx/target_dist, self._dy * target_dy/target_dist)
+                    self.move_to(target.X, target.Y)
                 else:
                     # hit target TODO
-                    print(f"hit {target}")
+                    hit_points = max(self.get_aptitude(PhysicalAptitudes.CONS).Value - target.get_aptitude(PhysicalAptitudes.CONS).Value, 0.1)
+                    target.hit(hit_points)

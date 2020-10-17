@@ -21,7 +21,7 @@ Shape creation:
 
 class Player(Biomorph, GameObject):
 
-    def __init__(self, x, y, width, height, obstacles):
+    def __init__(self, x, y, width, height, life, obstacles):
         Biomorph.__init__(self)
         GameObject.__init__(self, x, y)
         self._width = width
@@ -30,6 +30,7 @@ class Player(Biomorph, GameObject):
         self._goal = None
         self._morph_target = None
         self._hue = 0
+        self._life = life
 
         # define aptitudes
         self.set_aptitude(PhysicalAptitudes.PERC, 1)
@@ -63,6 +64,10 @@ class Player(Biomorph, GameObject):
         return '    '.join([f"{key.name} = {ap.Value:0.1f}" for key, ap in self.Aptitudes.items()])
 
     @property
+    def Life(self):
+        return self._life
+
+    @property
     def Vision(self):
         return self._vision
 
@@ -81,6 +86,9 @@ class Player(Biomorph, GameObject):
     @Target.setter
     def Target(self, target):
         self._morph_target = target
+
+    def hit(self, hit_points):
+        self._life = max(self._life - hit_points, 0)
 
     def move(self, dx, dy):
         new_x = self._shape._x + dx

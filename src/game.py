@@ -20,7 +20,7 @@ WORLD_XMIN =  SCREEN_WIDTH/2 - WORLD_WIDTH/2
 WORLD_XMAX =  SCREEN_WIDTH/2 + WORLD_WIDTH/2
 WORLD_YMIN =  SCREEN_HEIGHT/2 - WORLD_HEIGHT/2
 WORLD_YMAX =  SCREEN_HEIGHT/2 + WORLD_HEIGHT/2
-
+PLAYER_INIT_LIFE = 1000
 
 # --- Game levels ---
 
@@ -134,10 +134,22 @@ class GameView(arcade.View):
             player_dict = level['player']
             if 'pos' in player_dict:
                 pos = player_dict['pos']
-                self._player = Player(pos[0], pos[1], SCREEN_WIDTH, SCREEN_HEIGHT, self._obstacles)
+                self._player = Player(
+                    pos[0], 
+                    pos[1], 
+                    SCREEN_WIDTH, 
+                    SCREEN_HEIGHT, 
+                    PLAYER_INIT_LIFE, 
+                    self._obstacles)
             else:
                 # we need a player so by default position is the center of the screen
-                self._player = Player(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, SCREEN_WIDTH, SCREEN_HEIGHT, self._obstacles)
+                self._player = Player(
+                    SCREEN_WIDTH/2, 
+                    SCREEN_HEIGHT/2, 
+                    SCREEN_WIDTH, 
+                    SCREEN_HEIGHT, 
+                    PLAYER_INIT_LIFE, 
+                    self._obstacles)
 
         # load npcs        
         self._npcs = []
@@ -153,9 +165,15 @@ class GameView(arcade.View):
                                 x = random.randrange(area[0], area[2])
                                 y = random.randrange(area[1], area[3])
                                 if npc_class == Npc.type.Wanderer:
-                                    self._npcs.append(Wanderer(x, y, area))
+                                    self._npcs.append(Wanderer(
+                                        x, 
+                                        y, 
+                                        area))
                                 elif npc_class == Npc.type.Guard:
-                                    self._npcs.append(Guard(x, y, area))
+                                    self._npcs.append(Guard(
+                                        x, 
+                                        y, 
+                                        area))
 
         # add buttons and flow
         self._buttons = []
@@ -218,7 +236,7 @@ class GameView(arcade.View):
             line_list.draw()
 
         # render NPCs
-        text_y = 16
+        text_y = 14
         for npc in self._npcs:
             npc.draw()
             if npc.Hit is True:
@@ -233,12 +251,38 @@ class GameView(arcade.View):
             button.draw()
 
         # display game infos
-        arcade.draw_text(str(self._level_name), SCREEN_WIDTH/2, SCREEN_HEIGHT - 25, arcade.color.WHITE, 20, anchor_x='center')
+        arcade.draw_text(
+            str(self._level_name), 
+            SCREEN_WIDTH/2, 
+            SCREEN_HEIGHT - 25, 
+            arcade.color.WHITE, 20, 
+            anchor_x='center')
+        # time info
         minutes = int(self._total_time) // 60
         seconds = int(self._total_time) % 60
         output = f"Time: {minutes:02d}:{seconds:02d}"
-        arcade.draw_text(output, SCREEN_WIDTH/2, SCREEN_HEIGHT - 55, arcade.color.WHITE, 25, anchor_x='center')
-        arcade.draw_text(str(self._player), SCREEN_WIDTH/2, 16, arcade.color.WHITE, 14, anchor_x='center')
+        arcade.draw_text(
+            output, 
+            SCREEN_WIDTH/2, 
+            SCREEN_HEIGHT - 55, 
+            arcade.color.WHITE, 
+            25, 
+            anchor_x='center')
+        # player info
+        arcade.draw_text(
+            f"Life: {self._player.Life:.0f}", 
+            SCREEN_WIDTH/2, 
+            text_y + 20, 
+            arcade.color.WHITE if self._player.Life > 99 else arcade.color.RED, 
+            20, 
+            anchor_x='center')
+        arcade.draw_text(
+            str(self._player), 
+            SCREEN_WIDTH/2, 
+            14,
+            arcade.color.WHITE, 
+            14, 
+            anchor_x='center')
 
         # display performance
         if self._perf:
