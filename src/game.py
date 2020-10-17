@@ -6,7 +6,7 @@ from shape import Rectangle, Ellipse
 from game_object import GameObject
 from player import Player
 from npc import Npc, Wanderer, Guard
-from button import ArrowButton
+from button import ArrowButton, ButtonType
 
 # --- Constants ---
 SCREEN_WIDTH =  800
@@ -157,14 +157,33 @@ class GameView(arcade.View):
 
         # add buttons and flow
         self._buttons = []
+        self._button_hover = None
         if next_level is not None:
             self._buttons.append(
-                ArrowButton("Next", SCREEN_WIDTH - 50, SCREEN_HEIGHT - 40, 30, 35, arcade.color.ORANGE_PEEL, ArrowButton.direction.right)
+                ArrowButton(
+                    "Next", 
+                    SCREEN_WIDTH - 50, 
+                    SCREEN_HEIGHT - 40, 
+                    30, 
+                    35, 
+                    ButtonType.arrow_right, 
+                    arcade.color.ORANGE_PEEL, 
+                    arcade.color.RED_ORANGE,
+                    arcade.color.BLACK_BEAN)
             )
 
         if prev_level is not None:
             self._buttons.append(
-                ArrowButton("Prev", 20, SCREEN_HEIGHT - 40, 30, 35, arcade.color.ORANGE_PEEL, ArrowButton.direction.left)
+                ArrowButton(
+                    "Back", 
+                    20, 
+                    SCREEN_HEIGHT - 40, 
+                    30, 
+                    35, 
+                    ButtonType.arrow_left, 
+                    arcade.color.ORANGE_PEEL,
+                    arcade.color.RED_ORANGE,
+                    arcade.color.BLACK_BEAN)
             )
 
     def on_draw(self):
@@ -242,25 +261,28 @@ class GameView(arcade.View):
         #    self.window.set_viewport(0, SCREEN_WIDTH, 0, SCREEN_HEIGHT)
 
     def on_mouse_motion(self, x, y, dx, dy):
-            for button in self._buttons:
-                button.hover(x, y)
+        for button in self._buttons:
+            if button.is_hover(x, y):
+                self._button_hover = button
+                break
+        else:
+            self._button_hover = None
 
     def on_mouse_press(self, x, y, button, modifiers):
         if button == arcade.MOUSE_BUTTON_LEFT:
-            # test buttons
-            for button in self._buttons:
-                if button.is_inside(x, y) is True:
-                    if button.Direction == ArrowButton.direction.right:
-                        if self._level == LEVEL_1:
-                            start_view = GameView()
-                            start_view.setup(LEVEL_2, None, LEVEL_1)
-                            self.window.show_view(start_view)
+            # check is buttons have been clicked
+            if self._button_hover is not None:
+                if self._button_hover.Type == ButtonType.arrow_right:
+                    if self._level == LEVEL_1:
+                        start_view = GameView()
+                        start_view.setup(LEVEL_2, None, LEVEL_1)
+                        self.window.show_view(start_view)
 
-                    if button.Direction == ArrowButton.direction.left:
-                        if self._level == LEVEL_2:
-                            start_view = GameView()
-                            start_view.setup(LEVEL_1, LEVEL_2, None)
-                            self.window.show_view(start_view)
+                if self._button_hover.Type == ButtonType.arrow_left:
+                    if self._level == LEVEL_2:
+                        start_view = GameView()
+                        start_view.setup(LEVEL_1, LEVEL_2, None)
+                        self.window.show_view(start_view)
 
             # test if we've hit a npc
             for (npc, _) in self._player_neighbours:
