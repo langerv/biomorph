@@ -3,13 +3,14 @@ from shape import Rectangle
 from npc import Npc
 from aptitude import PhysicalAptitudes, PsychicalAptitudes
 
+
 '''
 Class Wanderer (NPC)
 Behaviour: wander in the area and do nothing else (as preys)
 '''
 
 class Wanderer(Npc):
-    
+
     def __init__(self, x, y, area):
         Npc.__init__(self, x, y, area)
        # design Wanderer aptitudes

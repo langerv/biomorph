@@ -20,6 +20,8 @@ class Npc(Character, GameObject):
         GameObject.__init__(self, x, y)
         self._width = area[2] - area[0]
         self._height = area[3] - area[1]
+        self._center_x = (area[0] + area[2])/2
+        self._center_y = (area[1] + area[3])/2
         self._hit = False
         self._hit_time = 0
         self._area = area
@@ -47,6 +49,17 @@ class Npc(Character, GameObject):
     @Hit.setter
     def Hit(self, value):
         self._hit = value
+
+    def in_area(self):
+        return self._shape._x >= self._area[0] and self._shape._x <= self._area[2] and self._shape._y >= self._area[1] and self._shape._x <= self._area[3]
+
+    def move_to(self, x, y):
+        dx = x - self._shape._x
+        dy = y - self._shape._y
+        dist = math.sqrt(dx**2+dy**2)
+        if dist >= self._delta:
+            return self.move(self._dx * dx/dist, self._dy * dy/dist)
+        return True        
 
     def move(self, dx, dy):
         self._shape._x += dx

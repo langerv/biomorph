@@ -34,6 +34,7 @@ class Guard(Npc):
         self._vision = self.vision_rule(PhysicalAptitudes.PERC)
 
         self._dx = self._dy = self.speed_rule(PhysicalAptitudes.MOVE)
+        self._delta = self.Delta_Speed
         self._patrol_dx = self._patrol_dy = 0
         if self._width >= self._height:
             self._patrol_dx = self._dx
@@ -60,15 +61,16 @@ class Guard(Npc):
                 target = neighbour
                 target_dist = dist
 
-        # action: Guard FSM
+        ''' guard FSM '''
         if self._state == Guard.state.idle:
             self._state = Guard.state.patrol
-
+    
+        # patrol behaviour
         elif self._state == Guard.state.patrol:
             if target_dist < self._vision:
                 self._state = Guard.state.watch
             else:
-                # patrol
+                # patrol move
                 if self._shape._x < self._area[0] and self._patrol_dx < 0:
                     self._patrol_dx *= -1
                 if self._shape._x > self._area[2] and self._patrol_dx > 0:
@@ -79,24 +81,38 @@ class Guard(Npc):
                     self._patrol_dy *= -1
                 self.move(self._patrol_dx, self._patrol_dy)
 
+        # watch behaviour
         elif self._state == Guard.state.watch:
-            # watch
             if target_dist >= self._vision:
-                # TODO: if not inside area, go to center of the area first
-                self._state = Guard.state.patrol
+                # target too far, get back to patrol behaviour
+                if self.in_area() is True:
+                    # guard in area, patrol again
+                    self._state = Guard.state.patrol
+                else:
+                    # guard not in area, go to center of the area first
+                    self.move_to(self._center_x, self._center_y)
+                    '''
+                    dx = self._center_x - self._shape._x
+                    dy = self._center_y - self._shape._y
+                    dist = math.sqrt(dx**2+dy**2)
+                    if dist >= self._delta:
+                        self.move(self._dx * dx/dist, self._dy * dy/dist)
+                    '''
+
             elif target_dist < self._vision/2:
+                # target too close, attack!
                 self._state = Guard.state.attack
             else:
                 # follow at distance TODO
                 pass
 
+        # attack behaviour
         elif self._state == Guard.state.attack:
-            # attack
             if target_dist >= self._vision/2:
                 self._state = Guard.state.watch
             else:
                 # move towards target
-                if target_dist >= self.Delta_Speed:
+                if target_dist >= self._delta:
                     self.move(self._dx * target_dx/target_dist, self._dy * target_dy/target_dist)
                 else:
                     # hit target TODO
