@@ -99,7 +99,7 @@ class Guard(Npc):
 
             else:
                 # follow at distance TODO
-                pass
+                self.look_at(target.X, target.Y)
 
         # attack behaviour
         elif self._state == Guard.state.attack:

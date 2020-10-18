@@ -53,6 +53,12 @@ class Npc(Character, GameObject):
     def in_area(self):
         return self._shape._x >= self._area[0] and self._shape._x <= self._area[2] and self._shape._y >= self._area[1] and self._shape._x <= self._area[3]
 
+    def look_at(self, x, y):
+        dx = x - self._shape._x
+        dy = y - self._shape._y
+        self._shape._angle = math.atan2(dy, dx) * GameObject.RAD2DEG
+        return True
+
     def move_to(self, x, y):
         dx = x - self._shape._x
         dy = y - self._shape._y

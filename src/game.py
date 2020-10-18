@@ -90,8 +90,13 @@ class GameView(arcade.View):
         self._total_time = 0.0        
         self._npcs = None
         self._player_neighbours = []
+        #  game over variable and effect
         self._game_over = False
         self._blink = False
+        self._font_size = 20
+        self._font_size_delta = 1
+        self._font_angle = 0
+        self._font_angle_delta = 10
 
     def setup(self, level, next_level=None, prev_level=None):
         # level
@@ -218,9 +223,6 @@ class GameView(arcade.View):
             self._fps_start_timer = timeit.default_timer()
         self._frame_count += 1
 
-        if self._frame_count % 20 == 0:
-                self._blink = not self._blink
-
         # render game stuffs
         arcade.start_render()
 
@@ -256,23 +258,39 @@ class GameView(arcade.View):
         for button in self._buttons:
             button.draw()
 
+        # game over screen
         if self._game_over is True:
+            
+            self._font_size += self._font_size_delta
+            if self._font_size > 60 or self._font_size < 20:
+                self._font_size_delta *= -1
+
+            self._font_angle += self._font_angle_delta 
+            if self._font_angle >= 360:
+                self._font_angle = self._font_angle_delta = 0
+
+            if self._frame_count % 20 == 0:
+                self._blink = not self._blink
+
             arcade.draw_text(
                 "GAME OVER!\n", 
                 SCREEN_WIDTH/2, 
                 SCREEN_HEIGHT/2, 
                 arcade.color.WHITE, 
-                font_size=40,
-                anchor_x="center")
+                font_size=self._font_size, #40,
+                anchor_x="center",
+                anchor_y="center",
+                rotation=self._font_angle)
 
             if self._blink is True:
                 arcade.draw_text(
                     "Click to REPLAY!", 
                     SCREEN_WIDTH/2, 
-                    SCREEN_HEIGHT/2-50,
+                    SCREEN_HEIGHT/2-60,
                     arcade.color.GREEN_YELLOW, 
                     font_size=20, 
-                    anchor_x="center")
+                    anchor_x="center",
+                    rotation=-3)
 
         # display game infos
         arcade.draw_text(
@@ -428,7 +446,7 @@ class MenuView(arcade.View):
     def on_update(self, delta_time):
         self._count_frame += 1
         self._title_color[3] = 255 if self._title_color[3] >= 255 else self._title_color[3] + self._alpha_delta
-        if self._title_color[3] > 200 and self._count_frame % 20 == 0:
+        if self._title_color[3] > 100 and self._count_frame % 20 == 0:
             self._blink = not self._blink
 
     def on_key_press(self, key, modifiers):
@@ -446,7 +464,8 @@ class MenuView(arcade.View):
             self._title_color, 
             font_size=40,
             anchor_x="center",
-            anchor_y="center")
+            anchor_y="center",
+            rotation=3)
 
         if self._blink is True:
             arcade.draw_text(
@@ -455,7 +474,8 @@ class MenuView(arcade.View):
                 SCREEN_HEIGHT/2-75, 
                 arcade.color.GREEN_YELLOW, 
                 font_size=20, 
-                anchor_x="center")
+                anchor_x="center",
+                rotation=-3)
 
     def on_mouse_press(self, _x, _y, _button, _modifiers):
         start_view = GameView()
