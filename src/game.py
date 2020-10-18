@@ -90,6 +90,8 @@ class GameView(arcade.View):
         self._total_time = 0.0        
         self._npcs = None
         self._player_neighbours = []
+        self._game_over = False
+        self._blink = False
 
     def setup(self, level, next_level=None, prev_level=None):
         # level
@@ -216,8 +218,12 @@ class GameView(arcade.View):
             self._fps_start_timer = timeit.default_timer()
         self._frame_count += 1
 
+        if self._frame_count % 20 == 0:
+                self._blink = not self._blink
+
         # render game stuffs
         arcade.start_render()
+
         self._background_shape.draw()
         self._map.draw()
         
@@ -250,6 +256,24 @@ class GameView(arcade.View):
         for button in self._buttons:
             button.draw()
 
+        if self._game_over is True:
+            arcade.draw_text(
+                "GAME OVER!\n", 
+                SCREEN_WIDTH/2, 
+                SCREEN_HEIGHT/2, 
+                arcade.color.WHITE, 
+                font_size=40,
+                anchor_x="center")
+
+            if self._blink is True:
+                arcade.draw_text(
+                    "Click to REPLAY!", 
+                    SCREEN_WIDTH/2, 
+                    SCREEN_HEIGHT/2-50,
+                    arcade.color.GREEN_YELLOW, 
+                    font_size=20, 
+                    anchor_x="center")
+
         # display game infos
         arcade.draw_text(
             str(self._level_name), 
@@ -257,6 +281,7 @@ class GameView(arcade.View):
             SCREEN_HEIGHT - 25, 
             arcade.color.WHITE, 20, 
             anchor_x='center')
+
         # time info
         minutes = int(self._total_time) // 60
         seconds = int(self._total_time) % 60
@@ -268,14 +293,16 @@ class GameView(arcade.View):
             arcade.color.WHITE, 
             25, 
             anchor_x='center')
+
         # player info
         arcade.draw_text(
             f"Life: {self._player.Life:.0f}", 
             SCREEN_WIDTH/2, 
             text_y + 20, 
-            arcade.color.WHITE if self._player.Life > 99 else arcade.color.RED, 
+            arcade.color.RED if self._player.Life < 200 else arcade.color.WHITE, 
             20, 
             anchor_x='center')
+
         arcade.draw_text(
             str(self._player), 
             SCREEN_WIDTH/2, 
@@ -329,21 +356,35 @@ class GameView(arcade.View):
                         start_view.setup(LEVEL_1, LEVEL_2, None)
                         self.window.show_view(start_view)
 
-            # test if we've hit a npc
-            for (npc, _) in self._player_neighbours:
-                 if npc.is_inside(x, y):
-                    if npc.Hit is False:
-                        npc.Hit = True
-                        return
-                    else:
-                        self._player.Target = npc
+        if self._game_over is True:
+            start_view = GameView()
+            start_view.setup(LEVEL_2, None, LEVEL_1)
+            self.window.show_view(start_view)
 
-            # set playe goal
-            self._player.Goal = (x, y)
+        # test if we've hit a npc
+        for (npc, _) in self._player_neighbours:
+            if npc.is_inside(x, y):
+                if npc.Hit is False:
+                    npc.Hit = True
+                    return
+                else:
+                    self._player.Target = npc
+
+        # set playe goal
+        self._player.Goal = (x, y)
 
     def on_update(self, delta_time):
+        # end game condition
+        if self._game_over is True:
+            return
+        elif self._player.Life == 0:
+            self._game_over = True
+            return
+
         start_time = timeit.default_timer()
+        # update player
         self._player.update(delta_time)
+        # update NPCs and compute player's neigbourhood
         self._player_neighbours = []
         squared_vision = self._player.Vision**2
         for npc in self._npcs:
@@ -354,7 +395,6 @@ class GameView(arcade.View):
                 squared_dist = dx**2+dy**2
                 if squared_dist < squared_vision: # and only if in range of player's perception
                     self._player_neighbours.append((npc, squared_dist))
-
         self._total_time += delta_time
         self._processing_time = timeit.default_timer() - start_time
 

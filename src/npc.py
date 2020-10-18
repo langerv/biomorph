@@ -57,9 +57,9 @@ class Npc(Character, GameObject):
         dx = x - self._shape._x
         dy = y - self._shape._y
         dist = math.sqrt(dx**2+dy**2)
-        if dist >= self._delta:
+        if dist > 0:
             return self.move(self._dx * dx/dist, self._dy * dy/dist)
-        return True        
+        return True
 
     def move(self, dx, dy):
         self._shape._x += dx

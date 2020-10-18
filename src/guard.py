@@ -30,8 +30,10 @@ class Guard(Npc):
         self.set_aptitude(PhysicalAptitudes.CONS, 5)
         self.set_aptitude(PsychicalAptitudes.INTL, 2)
         self.set_aptitude(PsychicalAptitudes.CHAR, 2)
+
         # compute Guard attributes
         self._vision = self.vision_rule(PhysicalAptitudes.PERC)
+        self._vision_limit_attack = self._vision * 0.7
 
         self._dx = self._dy = self.speed_rule(PhysicalAptitudes.MOVE)
         self._delta = self.Delta_Speed
@@ -91,7 +93,7 @@ class Guard(Npc):
                     # guard not in area, go to center of the area first
                     self.move_to(self._center_x, self._center_y)
 
-            elif target_dist < self._vision/2:
+            elif target_dist < self._vision_limit_attack:
                 # target too close, attack!
                 self._state = Guard.state.attack
             else:
@@ -100,13 +102,13 @@ class Guard(Npc):
 
         # attack behaviour
         elif self._state == Guard.state.attack:
-            if target_dist >= self._vision/2:
+            if target_dist >= self._vision_limit_attack:
                 self._state = Guard.state.watch
             else:
                 # move towards target
                 if target_dist >= self._delta:
                     self.move_to(target.X, target.Y)
                 else:
-                    # hit target TODO
+                    # hit target: hit points depend on difference of Constitution with minimum of 0.1
                     hit_points = max(self.get_aptitude(PhysicalAptitudes.CONS).Value - target.get_aptitude(PhysicalAptitudes.CONS).Value, 0.1)
                     target.hit(hit_points)
