@@ -94,7 +94,7 @@ class GameView(arcade.View):
         self._game_over = False
         self._blink = False
         self._font_size = 20
-        self._font_size_delta = 1
+        self._font_size_delta = 2
         self._font_angle = 0
         self._font_angle_delta = 10
 
