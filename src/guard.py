@@ -96,6 +96,7 @@ class Guard(Npc):
             elif target_dist < self._vision_limit_attack:
                 # target too close, attack!
                 self._state = Guard.state.attack
+
             else:
                 # follow at distance TODO
                 pass

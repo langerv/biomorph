@@ -68,7 +68,7 @@ LEVEL_2 = {
         {
             'class': Npc.type.Guard,
             'quantity':1,
-            'area':(330, SCREEN_HEIGHT - 145, 470, SCREEN_HEIGHT - 95)}
+            'area':(330, SCREEN_HEIGHT - 145, 470, SCREEN_HEIGHT - 105)}
     ]
 }
 
@@ -341,6 +341,9 @@ class GameView(arcade.View):
         else:
             self._button_hover = None
 
+    '''
+    Game flow to refactor
+    '''
     def on_mouse_press(self, x, y, button, modifiers):
         if button == arcade.MOUSE_BUTTON_LEFT:
             # check is buttons have been clicked
@@ -356,6 +359,7 @@ class GameView(arcade.View):
                         start_view.setup(LEVEL_1, LEVEL_2, None)
                         self.window.show_view(start_view)
 
+        # in a game over state, just relaunch the same scene
         if self._game_over is True:
             start_view = GameView()
             start_view.setup(LEVEL_2, None, LEVEL_1)
@@ -382,8 +386,10 @@ class GameView(arcade.View):
             return
 
         start_time = timeit.default_timer()
+
         # update player
         self._player.update(delta_time)
+
         # update NPCs and compute player's neigbourhood
         self._player_neighbours = []
         squared_vision = self._player.Vision**2
@@ -395,6 +401,7 @@ class GameView(arcade.View):
                 squared_dist = dx**2+dy**2
                 if squared_dist < squared_vision: # and only if in range of player's perception
                     self._player_neighbours.append((npc, squared_dist))
+
         self._total_time += delta_time
         self._processing_time = timeit.default_timer() - start_time
 

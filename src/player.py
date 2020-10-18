@@ -90,6 +90,22 @@ class Player(Biomorph, GameObject):
     def hit(self, hit_points):
         self._life = max(self._life - hit_points, 0)
 
+    def move_to(self, goal):
+        (x, y) = goal
+        dx = x - self._shape._x
+        dy = y - self._shape._y
+        dist = math.sqrt(dx**2+dy**2)
+        if dist >= self._delta:
+            if self.move(self._dx * dx/dist, self._dy * dy/dist) is False:
+                # we collided then stop
+                return True
+        else:
+            # we arrived
+            self._shape._x = x
+            self._shape._y = y
+            return True
+        return False
+
     def move(self, dx, dy):
         new_x = self._shape._x + dx
         new_y = self._shape._y + dy
@@ -114,20 +130,9 @@ class Player(Biomorph, GameObject):
         self._color = self.color_rule(PsychicalAptitudes.INTL, PsychicalAptitudes.CHAR)
         self._shape = Ellipse(self._shape._x, self._shape._y, 0, self._size/2, self._size/2, self._color, self._outline_color)
 
-        # Move to Goal
+        # move to Goal if exists
         if self._goal is not None:
-            (x, y) = self._goal
-            dx = x - self._shape._x
-            dy = y - self._shape._y
-            dist = math.sqrt(dx**2+dy**2)
-            if dist >= self._delta:
-                if self.move(self._dx * dx/dist, self._dy * dy/dist) is False:
-                    # we collided then stop
-                    self._goal = None
-            else:
-                # we arrived
-                self._shape._x = x
-                self._shape._y = y
+            if self.move_to(self._goal) is True:
                 self._goal = None
 
         # morph
