@@ -86,19 +86,19 @@ class Guard(Npc):
         elif self._state == Guard.state.watch:
             if target_dist >= self._vision:
                 # target too far, get back to patrol behaviour
-                if self.in_area() is True:
+                if self.in_area(self._shape._x, self._shape._y) is True:
                     # guard in area, patrol again
                     self._state = Guard.state.patrol
                 else:
                     # guard not in area, go to center of the area first
                     self.move_to(self._center_x, self._center_y)
 
-            elif target_dist < self._vision_limit_attack:
+            elif target_dist < self._vision_limit_attack: 
                 # target too close, attack!
                 self._state = Guard.state.attack
 
             else:
-                # follow at distance TODO
+                # follow at distance
                 self.look_at(target.X, target.Y)
 
         # attack behaviour

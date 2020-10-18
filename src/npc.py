@@ -50,8 +50,8 @@ class Npc(Character, GameObject):
     def Hit(self, value):
         self._hit = value
 
-    def in_area(self):
-        return self._shape._x >= self._area[0] and self._shape._x <= self._area[2] and self._shape._y >= self._area[1] and self._shape._x <= self._area[3]
+    def in_area(self, x, y):
+        return x >= self._area[0] and x <= self._area[2] and y >= self._area[1] and y <= self._area[3]
 
     def look_at(self, x, y):
         dx = x - self._shape._x

@@ -266,8 +266,9 @@ class GameView(arcade.View):
                 self._font_size_delta *= -1
 
             self._font_angle += self._font_angle_delta 
-            if self._font_angle >= 360:
-                self._font_angle = self._font_angle_delta = 0
+            if self._font_angle >= 363:
+                self._font_angle = 3
+                self._font_angle_delta = 0
 
             if self._frame_count % 20 == 0:
                 self._blink = not self._blink
@@ -286,7 +287,7 @@ class GameView(arcade.View):
                 arcade.draw_text(
                     "Click to REPLAY!", 
                     SCREEN_WIDTH/2, 
-                    SCREEN_HEIGHT/2-60,
+                    SCREEN_HEIGHT/2-70,
                     arcade.color.GREEN_YELLOW, 
                     font_size=20, 
                     anchor_x="center",
