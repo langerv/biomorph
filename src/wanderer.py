@@ -20,7 +20,7 @@ class Wanderer(Npc):
         self.set_aptitude(PsychicalAptitudes.INTL, random.randrange(1,6))
         self.set_aptitude(PsychicalAptitudes.CHAR, random.randrange(1,6))
         # compute Wanderer attributes
-        self._vision = self.vision_rule(PhysicalAptitudes.PERC)
+        self._vision = self.vision_rule(PhysicalAptitudes.PERC, 15)
         self._dx = self._dy = self.speed_rule(PhysicalAptitudes.MOVE)
         self._size = self.size_rule(PhysicalAptitudes.CONS)
         self._hue = random.random()

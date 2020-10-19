@@ -27,7 +27,7 @@ class Npc(Character, GameObject):
         self._area = area
         self._hue = 0
         # create rules to transform aptitudes to NPC behaviours
-        self.vision_rule = lambda a : self.get_aptitude(a).Value * max(self._width, self._height)/2
+        self.vision_rule = lambda a, b : self.get_aptitude(a).Value * math.sqrt(self._width**2 + self._height**2)/b
         self.speed_rule = lambda a : self.get_aptitude(a).Value
         self.size_rule = lambda a : GameObject.MIN_SHAPE_SIZE + self.get_aptitude(a).Value**2 
         self.color_rule = lambda a, b :  self.HLS_to_Color(

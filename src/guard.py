@@ -32,8 +32,8 @@ class Guard(Npc):
         self.set_aptitude(PsychicalAptitudes.CHAR, 2)
 
         # compute Guard attributes
-        self._vision = self.vision_rule(PhysicalAptitudes.PERC)
-        self._vision_limit_attack = self._vision * 0.7
+        self._vision = self.vision_rule(PhysicalAptitudes.PERC, 2)
+        self._vision_threshold_attack = self._vision * 0.7
 
         self._dx = self._dy = self.speed_rule(PhysicalAptitudes.MOVE)
         self._delta = self.Delta_Speed
@@ -93,7 +93,7 @@ class Guard(Npc):
                     # guard not in area, go to center of the area first
                     self.move_to(self._center_x, self._center_y)
 
-            elif target_dist < self._vision_limit_attack: 
+            elif target_dist < self._vision_threshold_attack: 
                 # target too close, attack!
                 self._state = Guard.state.attack
 
@@ -103,7 +103,7 @@ class Guard(Npc):
 
         # attack behaviour
         elif self._state == Guard.state.attack:
-            if target_dist >= self._vision_limit_attack:
+            if target_dist >= self._vision_threshold_attack:
                 self._state = Guard.state.watch
             else:
                 # move towards target
