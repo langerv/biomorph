@@ -10,6 +10,33 @@ from wanderer import Wanderer
 from guard import Guard
 from button import ArrowButton, ButtonType
 
+
+'''
+History
+
+- Create base Arcade client: DONE
+- Add base aptitudes for characaters and biomorph - DONE
+
+- Level1 : morph training
+    - spawn various wanderer NPCs and logic fir morph - DONE
+    - make a better distribution of aptitudes among  - TODO
+
+- Level 2: the guard
+    - create obstacles - DONE
+    - create guard and basic attack AI - DONE
+    - create Life player stat and Game Over screen when dead - DONE
+    - create NPCs with psychical aptitudes the guard let pass (NPC + aptitude mask) - TODO
+
+- Level 3: the safe - TODO
+    -  create safe = obstacle with aptitude mask
+
+- Level 4: TODO
+    - add metabolism and energy stat - TODO 
+    - add food and eat logic - TODO
+
+'''
+
+
 # --- Constants ---
 SCREEN_WIDTH =  800
 SCREEN_HEIGHT = 650
