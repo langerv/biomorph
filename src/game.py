@@ -121,20 +121,16 @@ class GameView(arcade.View):
             if 'obstacles' in map_dict:
                 for obstacle in map_dict['obstacles']:
                     if 'color' in obstacle:
-                        point_list = None
                         if 'rectangle' in obstacle:
                             (x, y, width, height) = obstacle['rectangle']
-                            point_list = [
-                                (x, y), # xmin, ymin
-                                (x+width, y), #xmax, ymin
-                                (x+width, y+height), #xmax, ymax
-                                (x, y+height)] #xmin, ymax
-
-                        if point_list is not None:
                             self._obstacles.append((x, y, width, height))
-                            self._map.append(arcade.create_polygon(
-                                    point_list,
-                                    obstacle['color']))
+                            self._map.append(arcade.create_rectangle_filled(
+                                x+ width/2, y+height/2, 
+                                width, 
+                                height, 
+                                obstacle['color'], 
+                                0)
+                            )
 
         # load player
         if 'player' in level:
@@ -446,9 +442,14 @@ class MenuView(arcade.View):
     
     def on_update(self, delta_time):
         self._count_frame += 1
-        self._title_color[3] = 255 if self._title_color[3] >= 255 else self._title_color[3] + self._alpha_delta
+
+        self._title_color[3] = self._title_color[3] + self._alpha_delta
+        if self._title_color[3] >= 255:
+            self._title_color[3] = 255
+
         if self._title_color[3] > 100 and self._count_frame % 20 == 0:
             self._blink = not self._blink
+
 
     def on_key_press(self, key, modifiers):
         if key == arcade.key.ESCAPE:

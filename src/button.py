@@ -53,4 +53,12 @@ class ArrowButton(Button):
 
     def draw(self):
         super().draw()
-        arcade.draw_text(self._text, self._shape._x, self._shape._y,self._color_text, 12, anchor_x='center', anchor_y='center', rotation=5)
+        arcade.draw_text(
+            self._text, 
+            self._shape._x, 
+            self._shape._y,
+            self._color_text, 
+            12, 
+            anchor_x='center', 
+            anchor_y='center', 
+            rotation=5)
