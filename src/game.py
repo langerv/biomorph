@@ -444,7 +444,7 @@ class MenuView(arcade.View):
         self._count_frame += 1
 
         self._title_color[3] = self._title_color[3] + self._alpha_delta
-        if self._title_color[3] >= 255:
+        if self._title_color[3] > 255:
             self._title_color[3] = 255
 
         if self._title_color[3] > 100 and self._count_frame % 20 == 0:
