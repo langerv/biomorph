@@ -19,7 +19,7 @@ History
 
 - Level1 : morph training
     - spawn various wanderer NPCs and logic fir morph - DONE
-    - make a better distribution of aptitudes among  - TODO
+    - make a better distribution of aptitudes among NPCs - TODO
 
 - Level 2: the guard
     - create obstacles - DONE
