@@ -41,19 +41,19 @@ class Player(Biomorph, GameObject):
 
         # define behaviour and shape
         # create rules to transform aptitudes to behaviours
-        self.vision_rule = lambda a, b : self.get_aptitude(a).Value * math.sqrt(self._width**2 + self._height**2)/b
-        self.speed_rule = lambda a : self.get_aptitude(a).Value*2 # slight advantage for the player here
-        self.size_rule = lambda a : GameObject.MIN_SHAPE_SIZE + self.get_aptitude(a).Value**2 
+        self.vision_rule = lambda a, b : self.get_aptitude(a).Value * b
+        self.speed_rule = lambda a, b : self.get_aptitude(a).Value # slight advantage for the player here
+        self.size_rule = lambda a, b : GameObject.MIN_SHAPE_SIZE + self.get_aptitude(a).Value**b
         self.color_rule = lambda a, b :  self.HLS_to_Color(
             self._hue, # H
             self.get_aptitude(a).Value / 10, # L max is 0.5
             self.get_aptitude(b).Value / 5) # S max is 1.0
 
         # compute Player attributes
-        self._vision = self.vision_rule(PhysicalAptitudes.PERC, 15)
-        self._dx = self._dy = self.speed_rule(PhysicalAptitudes.MOVE)
+        self._vision = self.vision_rule(PhysicalAptitudes.PERC, 60)
+        self._dx = self._dy = self.speed_rule(PhysicalAptitudes.MOVE, 2)
         self._delta = self.Delta_Speed
-        self._size = self.size_rule(PhysicalAptitudes.CONS)
+        self._size = self.size_rule(PhysicalAptitudes.CONS, 2)
         self._color = self.color_rule(PsychicalAptitudes.INTL, PsychicalAptitudes.CHAR)
         self._outline_color =arcade.color.BRANDEIS_BLUE
 
@@ -121,12 +121,12 @@ class Player(Biomorph, GameObject):
         Biomorph.update(self)
 
         # update behaviours from morphing
-        self._vision = self.vision_rule(PhysicalAptitudes.PERC, 15)
-        speed = self.speed_rule(PhysicalAptitudes.MOVE)
+        self._vision = self.vision_rule(PhysicalAptitudes.PERC, 60)
+        speed = self.speed_rule(PhysicalAptitudes.MOVE, 2)
         if speed != self._dx or speed != self._dy:
             self._dx = self._dy = speed
             self._delta = self.Delta_Speed
-        self._size = self.size_rule(PhysicalAptitudes.CONS)
+        self._size = self.size_rule(PhysicalAptitudes.CONS, 2)
         self._color = self.color_rule(PsychicalAptitudes.INTL, PsychicalAptitudes.CHAR)
         self._shape = Ellipse(self._shape._x, self._shape._y, 0, self._size/2, self._size/2, self._color, self._outline_color)
 

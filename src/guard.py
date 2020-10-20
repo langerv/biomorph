@@ -32,10 +32,10 @@ class Guard(Npc):
         self.set_aptitude(PsychicalAptitudes.CHAR, 2)
 
         # compute Guard attributes
-        self._vision = self.vision_rule(PhysicalAptitudes.PERC, 2)
+        self._vision = self.get_aptitude(PhysicalAptitudes.PERC).Value * math.sqrt(self._width**2 + self._height**2)/2
         self._vision_threshold_attack = self._vision * 0.7
 
-        self._dx = self._dy = self.speed_rule(PhysicalAptitudes.MOVE)
+        self._dx = self._dy = self.speed_rule(PhysicalAptitudes.MOVE, 1)
         self._delta = self.Delta_Speed
         self._patrol_dx = self._patrol_dy = 0
         if self._width >= self._height:
@@ -43,7 +43,7 @@ class Guard(Npc):
         else:
             self._patrol_dy = self._dy
 
-        self._size = self.size_rule(PhysicalAptitudes.CONS)
+        self._size = self.size_rule(PhysicalAptitudes.CONS, 2)
         self._hue = 0
         self._color = arcade.color.RED
         # create shape
