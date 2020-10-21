@@ -8,6 +8,7 @@ from player import Player
 from npc import Npc
 from wanderer import Wanderer
 from guard import Guard
+from habitant import Habitant
 from button import ArrowButton, ButtonType
 
 
@@ -88,6 +89,10 @@ LEVEL_2 = {
         'pos':(SCREEN_WIDTH/2, 100)
         },
     'npc' : [
+        {
+            'class': Npc.type.Habitant,
+            'quantity':10, 
+            'area':(WORLD_XMIN, WORLD_YMIN, WORLD_XMAX, 400)},
         {
             'class': Npc.type.Wanderer,
             'quantity':30, 
@@ -194,6 +199,11 @@ class GameView(arcade.View):
                             for _ in range(num):
                                 x = random.randrange(area[0], area[2])
                                 y = random.randrange(area[1], area[3])
+                                if npc_class == Npc.type.Habitant:
+                                    self._npcs.append(Habitant(
+                                        x, 
+                                        y, 
+                                        area))
                                 if npc_class == Npc.type.Wanderer:
                                     self._npcs.append(Wanderer(
                                         x, 

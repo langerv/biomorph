@@ -12,6 +12,7 @@ class Npc(Character, GameObject):
     HIT_TIMER = 5 # number of seconds before a hit npc goes back to life
 
     class type(Enum):
+        Habitant = auto()
         Wanderer = auto()
         Guard = auto()
 
