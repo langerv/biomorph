@@ -91,12 +91,8 @@ LEVEL_2 = {
     'npc' : [
         {
             'class': Npc.type.Habitant,
-            'quantity':2, 
-            'area':(WORLD_XMIN, WORLD_YMIN, SCREEN_WIDTH/2, WORLD_YMAX)},
-        {
-            'class': Npc.type.Habitant,
-            'quantity':2, 
-            'area':(SCREEN_WIDTH/2, WORLD_YMIN, WORLD_XMAX, WORLD_YMAX)},
+            'quantity':3, 
+            'area':(350, WORLD_YMIN, 450, WORLD_YMAX)},
         {
             'class': Npc.type.Wanderer,
             'quantity':30, 

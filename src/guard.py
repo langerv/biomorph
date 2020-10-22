@@ -74,13 +74,14 @@ class Guard(Npc):
                 # patrol move
                 if self._shape._x < self._area[0] and self._patrol_dx < 0:
                     self._patrol_dx *= -1
-                if self._shape._x > self._area[2] and self._patrol_dx > 0:
+                elif self._shape._x > self._area[2] and self._patrol_dx > 0:
                     self._patrol_dx *= -1
-                if self._shape._y < self._area[1] and self._patrol_dy < 0:
+                elif self._shape._y < self._area[1] and self._patrol_dy < 0:
                     self._patrol_dy *= -1
-                if self._shape._y > self._area[3] and self._patrol_dy > 0:
+                elif self._shape._y > self._area[3] and self._patrol_dy > 0:
                     self._patrol_dy *= -1
-                self.move(self._patrol_dx, self._patrol_dy)
+                else:
+                    self.move(self._patrol_dx, self._patrol_dy)
 
         # watch behaviour
         elif self._state == Guard.state.watch:

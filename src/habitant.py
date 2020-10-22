@@ -5,7 +5,8 @@ from aptitude import PhysicalAptitudes, PsychicalAptitudes
 
 
 '''
-Class Local (NPC)
+Class Habitant (NPC)
+Bahviour: NPCs that are allowed to pass the guard, just go in/out of the protected area
 '''
 
 class Habitant(Npc):
@@ -20,9 +21,12 @@ class Habitant(Npc):
         self.set_aptitude(PsychicalAptitudes.CHAR, 5)
         # compute Wanderer attributes
         self._vision = self.vision_rule(PhysicalAptitudes.PERC, 60)
-        self._dx = self._dy = self.speed_rule(PhysicalAptitudes.MOVE, 1)
-        self._dir_x = self._dx
-        self._dir_y = 0
+
+        self._speed = self.speed_rule(PhysicalAptitudes.MOVE, 1)
+        self._dx = self._dy = self._speed
+        self._dir_x = self._dir_y = 0
+        self._dir_x = self._dx if random.random() <= 0.5 else -self._dx
+
         self._size = self.size_rule(PhysicalAptitudes.CONS, 2)
         self._hue = 0.85
         self._color = self.color_rule(PsychicalAptitudes.INTL, PsychicalAptitudes.CHAR)
@@ -40,20 +44,20 @@ class Habitant(Npc):
             if self._shape._x < self._area[0] and self._dir_x < 0:
                 self._dir_x = 0
                 self._dir_y = -self._dy
-
-            if self._shape._x > self._area[2] and self._dir_x > 0:
+            elif self._shape._x > self._area[2] and self._dir_x > 0:
                 self._dir_x = 0
                 self._dir_y = self._dy
-
-            if self._shape._y < self._area[1] and self._dir_y < 0:
+            elif self._shape._y < self._area[1] and self._dir_y < 0:
                 self._dir_x = self._dx
                 self._dir_y = 0
-
-            if self._shape._y > self._area[3] and self._dir_y > 0:
+            elif self._shape._y > self._area[3] and self._dir_y > 0:
                 self._dir_x = -self._dx
                 self._dir_y = 0
+            else:
+                self.move(self._dir_x, self._dir_y)
 
-            if random.randint(0, 1000) == 0:
-                self._dir_x, self._dir_y = self._dir_y, self._dir_x
+            if random.randint(0, 200) == 0:
+                newspeed = random.random() * self._speed
+                self._dir_x = newspeed if self._dir_x != 0 else 0
+                self._dir_y = newspeed if self._dir_y != 0 else 0
 
-            self.move(self._dir_x, self._dir_y)
