@@ -17,8 +17,8 @@ class Habitant(Npc):
         self.set_aptitude(PhysicalAptitudes.PERC, random.randrange(1,3))
         self.set_aptitude(PhysicalAptitudes.MOVE, random.randrange(4,6))
         self.set_aptitude(PhysicalAptitudes.CONS, random.randrange(1,3))
-        self.set_aptitude(PsychicalAptitudes.INTL, 5)
-        self.set_aptitude(PsychicalAptitudes.CHAR, 5)
+        self.set_aptitude(PsychicalAptitudes.INTL, 4)
+        self.set_aptitude(PsychicalAptitudes.CHAR, 4)
         # compute Wanderer attributes
         self._vision = self.vision_rule(PhysicalAptitudes.PERC, 60)
 
@@ -55,9 +55,8 @@ class Habitant(Npc):
                 self._dir_y = 0
             else:
                 self.move(self._dir_x, self._dir_y)
-
-            if random.randint(0, 200) == 0:
-                newspeed = random.random() * self._speed
-                self._dir_x = newspeed if self._dir_x != 0 else 0
-                self._dir_y = newspeed if self._dir_y != 0 else 0
-
+                # here we perturbate speed to make it a bit more challenging and fun
+                if random.randint(0, 100) == 0:
+                    newspeed = random.random() * self._speed
+                    self._dir_x = newspeed if self._dir_x != 0 else 0
+                    self._dir_y = newspeed if self._dir_y != 0 else 0

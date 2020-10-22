@@ -29,7 +29,9 @@ History
     - create NPCs with psychical aptitudes the guard let pass (NPC + aptitude mask) - TODO
 
 - Level 3: the safe - TODO
-    -  create safe = obstacle with aptitude mask
+    - create safe = obstacle with aptitude mask
+    - one for intelligence
+    - one for speed (laser beam)
 
 - Level 4: TODO
     - add metabolism and energy stat - TODO 
@@ -68,6 +70,7 @@ LEVEL_1 = {
             'area':(WORLD_XMIN, WORLD_YMIN, WORLD_XMAX, WORLD_YMAX)}
     ]
 }
+
 
 LEVEL_2 = {
     'name': 'Level 2',
