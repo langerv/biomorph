@@ -4,6 +4,7 @@ from enum import Enum, auto
 import random
 from shape import Rectangle
 from npc import Npc
+from habitant import Habitant
 from aptitude import PhysicalAptitudes, PsychicalAptitudes
 
 
@@ -49,11 +50,12 @@ class Guard(Npc):
         # create shape
         self._shape = Rectangle(x, y, 0, self._size, self._size, self._color)
 
-        # traits
-        # use CHAR int(0-5) and HUE float(0-1)
-        # cast to integers for encoding and approximate checking
+        ''' traits definition
+        use CHAR int(0-5) and HUE float(0-1)
+        cast to integers for encoding and approximate checking
+        '''
         self.traits_rule = lambda hue, char: int(255*hue) + (int(char) << 8)
-        self._pass_traits = self.traits_rule(0.85, 4)
+        self._pass_traits = self.traits_rule(Habitant.HUE, Habitant.CHARISMA)
 
     def check_traits(self, target):
         return self.traits_rule(target.Hue, target.get_aptitude(PsychicalAptitudes.CHAR).Value) == self._pass_traits

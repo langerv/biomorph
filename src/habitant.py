@@ -11,14 +11,17 @@ Bahviour: NPCs that are allowed to pass the guard, just go in/out of the protect
 
 class Habitant(Npc):
 
+    HUE = 0.85
+    CHARISMA = 4
+
     def __init__(self, x, y, area):
         Npc.__init__(self, x, y, area)
        # design Wanderer aptitudes
         self.set_aptitude(PhysicalAptitudes.PERC, random.randrange(1,3))
-        self.set_aptitude(PhysicalAptitudes.MOVE, random.randrange(3,6))
+        self.set_aptitude(PhysicalAptitudes.MOVE, random.randrange(4,6))
         self.set_aptitude(PhysicalAptitudes.CONS, random.randrange(1,3))
         self.set_aptitude(PsychicalAptitudes.INTL, random.randrange(3,6))
-        self.set_aptitude(PsychicalAptitudes.CHAR, 4)
+        self.set_aptitude(PsychicalAptitudes.CHAR, Habitant.CHARISMA)
         # compute Wanderer attributes
         self._vision = self.vision_rule(PhysicalAptitudes.PERC, 60)
 
@@ -28,7 +31,7 @@ class Habitant(Npc):
         self._dir_x = self._dx if random.random() <= 0.5 else -self._dx
 
         self._size = self.size_rule(PhysicalAptitudes.CONS, 2)
-        self._hue = 0.85
+        self._hue = Habitant.HUE
         self._color = self.color_rule(PsychicalAptitudes.INTL, PsychicalAptitudes.CHAR)
         # create shape
         self._shape = Rectangle(x, y, 0, self._size, self._size, self._color)
