@@ -15,9 +15,9 @@ class Habitant(Npc):
         Npc.__init__(self, x, y, area)
        # design Wanderer aptitudes
         self.set_aptitude(PhysicalAptitudes.PERC, random.randrange(1,3))
-        self.set_aptitude(PhysicalAptitudes.MOVE, random.randrange(4,6))
+        self.set_aptitude(PhysicalAptitudes.MOVE, random.randrange(3,6))
         self.set_aptitude(PhysicalAptitudes.CONS, random.randrange(1,3))
-        self.set_aptitude(PsychicalAptitudes.INTL, 4)
+        self.set_aptitude(PsychicalAptitudes.INTL, random.randrange(3,6))
         self.set_aptitude(PsychicalAptitudes.CHAR, 4)
         # compute Wanderer attributes
         self._vision = self.vision_rule(PhysicalAptitudes.PERC, 60)

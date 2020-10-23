@@ -49,8 +49,16 @@ class Guard(Npc):
         # create shape
         self._shape = Rectangle(x, y, 0, self._size, self._size, self._color)
 
-    def update(self, neighbours, delta_time):
+        # traits
+        # use CHAR int(0-5) and HUE float(0-1)
+        # cast to integers for encoding and approximate checking
+        self.traits_rule = lambda hue, char: int(255*hue) + (int(char) << 8)
+        self._pass_traits = self.traits_rule(0.85, 4)
 
+    def check_traits(self, target):
+        return self.traits_rule(target.Hue, target.get_aptitude(PsychicalAptitudes.CHAR).Value) == self._pass_traits
+
+    def update(self, neighbours, delta_time):
         # perception: find closest neighbour
         target = None
         target_dist = self._vision
@@ -68,7 +76,7 @@ class Guard(Npc):
     
         # patrol behaviour
         elif self._state == Guard.state.patrol:
-            if target_dist < self._vision:
+            if target_dist < self._vision and self.check_traits(target) is False:
                 self._state = Guard.state.watch
             else:
                 # patrol move

@@ -26,7 +26,7 @@ History
     - create obstacles - DONE
     - create guard and basic attack AI - DONE
     - create Life player stat and Game Over screen when dead - DONE
-    - create NPCs with psychical aptitudes the guard let pass (NPC + aptitude mask) - TODO
+    - create NPCs with psychical aptitudes the guard let pass (NPC + aptitude mask) - DONE
 
 - Level 3: the safe - TODO
     - create safe = obstacle with aptitude mask
@@ -107,6 +107,11 @@ LEVEL_2 = {
     ]
 }
 
+LEVEL_3 = {
+    'name': 'Level 3',
+    'player': {
+        'pos':(SCREEN_WIDTH/2, SCREEN_HEIGHT/2)}
+}
 
 '''
 GameView: gameplay screen
@@ -397,28 +402,40 @@ class GameView(arcade.View):
             self._button_hover = None
 
     '''
-    Game flow to refactor
     '''
     def on_mouse_press(self, x, y, button, modifiers):
         if button == arcade.MOUSE_BUTTON_LEFT:
             # check is buttons have been clicked
             if self._button_hover is not None:
+
+                # Game flow to refactor
                 if self._button_hover.Type == ButtonType.arrow_right:
                     if self._level == LEVEL_1:
                         start_view = GameView()
-                        start_view.setup(LEVEL_2, None, LEVEL_1)
+                        start_view.setup(LEVEL_2, LEVEL_3, LEVEL_1)
+                        self.window.show_view(start_view)
+                    elif self._level == LEVEL_2:
+                        start_view = GameView()
+                        start_view.setup(LEVEL_3, None, LEVEL_2)
                         self.window.show_view(start_view)
                 elif self._button_hover.Type == ButtonType.arrow_left:
                     if self._level == LEVEL_2:
                         start_view = GameView()
                         start_view.setup(LEVEL_1, LEVEL_2, None)
                         self.window.show_view(start_view)
+                    elif self._level == LEVEL_3:
+                        start_view = GameView()
+                        start_view.setup(LEVEL_2, LEVEL_3, LEVEL_1)
+                        self.window.show_view(start_view)
 
         # in a game over state, just relaunch the same scene
         if self._game_over is True:
-            start_view = GameView()
-            start_view.setup(LEVEL_2, None, LEVEL_1)
-            self.window.show_view(start_view)
+
+            # Game flow to refactor
+            if self._level == LEVEL_2:
+                start_view = GameView()
+                start_view.setup(LEVEL_2, LEVEL_3, LEVEL_1)
+                self.window.show_view(start_view)
 
         # test if we've hit a npc
         for (npc, _) in self._player_neighbours:

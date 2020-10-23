@@ -64,6 +64,10 @@ class Player(Biomorph, GameObject):
         return '    '.join([f"{key.name} = {ap.Value:0.1f}" for key, ap in self.Aptitudes.items()])
 
     @property
+    def Hue(self):
+        return self._hue
+
+    @property
     def Life(self):
         return self._life
 
