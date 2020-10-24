@@ -1,6 +1,7 @@
 import math
 import arcade
 from shape import Ellipse
+from obstacle import Obstacle
 from game_object import GameObject
 from biomorph import Biomorph
 from aptitude import PhysicalAptitudes, PsychicalAptitudes
@@ -114,8 +115,8 @@ class Player(Biomorph, GameObject):
         new_x = self._shape._x + dx
         new_y = self._shape._y + dy
         offset = self._size/2
-        for (x, y, width, height) in self._obstacles:
-            if new_x > x - offset and new_x < x + width + offset and new_y > y - offset and new_y < y + height + offset:
+        for ob in self._obstacles:
+            if new_x > ob.X - offset and new_x < ob.X + ob.Width + offset and new_y > ob.Y - offset and new_y < ob.Y + ob.Height + offset:
                 return False
         self._shape._x = new_x
         self._shape._y = new_y

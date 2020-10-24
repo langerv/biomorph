@@ -78,6 +78,7 @@ class Guard(Npc):
     
         # patrol behaviour
         elif self._state == Guard.state.patrol:
+            # this is where we chekc distance but also target's traits to see if it's worth looking at more...
             if target_dist < self._vision and self.check_traits(target) is False:
                 self._state = Guard.state.watch
             else:

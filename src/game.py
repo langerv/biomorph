@@ -4,6 +4,7 @@ import math
 import random
 from shape import Rectangle, Ellipse
 from game_object import GameObject
+from obstacle import Obstacle, Wall
 from player import Player
 from npc import Npc
 from wanderer import Wanderer
@@ -58,7 +59,7 @@ LEVEL_1 = {
     'name': 'Level 1',
     'map': {
         'color1':(5,10,5), 
-        'color2':(10,20,10)
+        'color2':(20,40,20)
         },
     'player': {
         'pos':(SCREEN_WIDTH/2, SCREEN_HEIGHT/2)
@@ -76,15 +77,17 @@ LEVEL_2 = {
     'name': 'Level 2',
     'map' : {
         'color1':(10,5,5), 
-        'color2':(20,10,10),
+        'color2':(40,20,20),
         'obstacles' : [
             {
+                'class':Obstacle.type.Wall,
                 'color':arcade.color.BLUE_GREEN,
-                'rectangle':(0, SCREEN_HEIGHT - 190, 300, 40) # rectangle is (x, y, width, height)
+                'area':(0, SCREEN_HEIGHT - 190, 300, 40) # area is (x, y, width, height)
             },
             {
+                'class':Obstacle.type.Wall,
                 'color':arcade.color.BLUE_GREEN,
-                'rectangle':(SCREEN_WIDTH - 300, SCREEN_HEIGHT - 190, 300, 40)
+                'area':(SCREEN_WIDTH - 300, SCREEN_HEIGHT - 190, 300, 40)
             }
         ]
     },
@@ -94,7 +97,7 @@ LEVEL_2 = {
     'npc' : [
         {
             'class': Npc.type.Habitant,
-            'quantity':3, 
+            'quantity':3,
             'area':(350, WORLD_YMIN, 450, WORLD_YMAX)},
         {
             'class': Npc.type.Wanderer,
@@ -109,8 +112,32 @@ LEVEL_2 = {
 
 LEVEL_3 = {
     'name': 'Level 3',
+    'map' : {
+        'color1':(5,5,10), 
+        'color2':(20,20,40),
+        'obstacles' : [
+            {
+                'class':Obstacle.type.Wall,
+                'color':arcade.color.BLUE_GREEN,
+                'area':(SCREEN_WIDTH/2-100, SCREEN_HEIGHT/2 + 100, 200, 40) # rectangle is (x, y, width, height)
+            },
+            {
+                'class':Obstacle.type.Wall,
+                'color':arcade.color.BLUE_GREEN,
+                'area':(SCREEN_WIDTH/2-100, SCREEN_HEIGHT/2 - 100, 200, 40) # rectangle is (x, y, width, height)
+            },
+        ]
+    },
     'player': {
-        'pos':(SCREEN_WIDTH/2, SCREEN_HEIGHT/2)}
+        'pos':(SCREEN_WIDTH/2 - 200, SCREEN_HEIGHT/2)
+    },
+    'npc' : [
+        {
+            'class': Npc.type.Wanderer,
+            'quantity':30,
+            'area':(WORLD_XMIN, WORLD_YMIN, WORLD_XMAX, WORLD_YMAX)
+        }
+    ]
 }
 
 '''
@@ -144,9 +171,8 @@ class GameView(arcade.View):
         self._background_shape = arcade.ShapeElementList()
         self._level = level
 
-        # load map
-        self._map = arcade.ShapeElementList()
-        self._obstacles = []
+        # load and create map
+        self._map = []
         if 'map' in level:
             map_dict = level['map']
             if 'color1' in map_dict:
@@ -160,17 +186,14 @@ class GameView(arcade.View):
 
             if 'obstacles' in map_dict:
                 for obstacle in map_dict['obstacles']:
-                    if 'color' in obstacle:
-                        if 'rectangle' in obstacle:
-                            (x, y, width, height) = obstacle['rectangle']
-                            self._obstacles.append((x, y, width, height))
-                            self._map.append(arcade.create_rectangle_filled(
-                                x+ width/2, y+height/2, 
-                                width, 
-                                height, 
-                                obstacle['color'], 
-                                0)
-                            )
+                    if 'class' in obstacle:
+                        obs_class = obstacle['class']
+                        if 'color' in obstacle:
+                            obs_color = obstacle['color']
+                            if 'area' in obstacle:
+                                (x, y, width, height) = obstacle['area']
+                                if obs_class == Obstacle.type.Wall:
+                                    self._map.append(Wall(x, y, width, height, obs_color))
 
         # load player
         if 'player' in level:
@@ -183,7 +206,7 @@ class GameView(arcade.View):
                     SCREEN_WIDTH, 
                     SCREEN_HEIGHT, 
                     PLAYER_INIT_LIFE, 
-                    self._obstacles)
+                    self._map)
             else:
                 # we need a player so by default position is the center of the screen
                 self._player = Player(
@@ -192,7 +215,7 @@ class GameView(arcade.View):
                     SCREEN_WIDTH, 
                     SCREEN_HEIGHT, 
                     PLAYER_INIT_LIFE, 
-                    self._obstacles)
+                    self._map)
 
         # load npcs        
         self._npcs = []
@@ -267,9 +290,11 @@ class GameView(arcade.View):
         # render game stuffs
         arcade.start_render()
 
+        # render map
         self._background_shape.draw()
-        self._map.draw()
-        
+        for map_elt in self._map:
+            map_elt.draw()
+
         # draw perception lines between player and perceived shapes
         line_list = arcade.ShapeElementList()
         for (npc, squared_dist) in self._player_neighbours:
@@ -458,6 +483,10 @@ class GameView(arcade.View):
             return
 
         start_time = timeit.default_timer()
+
+        # update map
+        for map_elt in self._map:
+            map_elt.update(delta_time)
 
         # update player
         self._player.update(delta_time)

@@ -1,0 +1,55 @@
+import abc
+from enum import Enum, auto
+from shape import Rectangle
+
+
+class Obstacle(abc.ABC):
+
+    class type(Enum):
+        Wall = auto()
+
+    def __init__(self, x, y, width, height, color):
+        self._x = x
+        self._y = y
+        self._width = width
+        self._height = height
+        self._shape = None
+
+    @property
+    def X(self):
+        return self._x
+
+    @property
+    def Y(self):
+        return self._y
+
+    @property
+    def Width(self):
+        return self._width
+
+    @property
+    def Height(self):
+        return self._height
+
+    @abc.abstractmethod
+    def update(self, delta_time):
+        pass
+
+    def draw(self):
+        self._shape.draw()
+        
+class Wall(Obstacle):
+
+    def __init__(self, x, y, width, height, color):
+        super().__init__(x, y, width, height, color)
+        self._shape = Rectangle(
+            x + width/2, 
+            y + height/2,
+            0,
+            width, 
+            height, 
+            color)
+
+    def update(self, delta_time):
+        pass
+
