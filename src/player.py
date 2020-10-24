@@ -115,8 +115,8 @@ class Player(Biomorph, GameObject):
         new_x = self._shape._x + dx
         new_y = self._shape._y + dy
         offset = self._size/2
-        for ob in self._obstacles:
-            if new_x > ob.X - offset and new_x < ob.X + ob.Width + offset and new_y > ob.Y - offset and new_y < ob.Y + ob.Height + offset:
+        for obs in self._obstacles:
+            if obs.collide(new_x, new_y, offset) is True:
                 return False
         self._shape._x = new_x
         self._shape._y = new_y

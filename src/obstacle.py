@@ -32,6 +32,10 @@ class Obstacle(abc.ABC):
         return self._height
 
     @abc.abstractmethod
+    def collide(self, x, y, half_size):
+        pass
+
+    @abc.abstractmethod
     def update(self, delta_time):
         pass
 
@@ -49,6 +53,9 @@ class Wall(Obstacle):
             width, 
             height, 
             color)
+
+    def collide(self, x, y, half_size):
+        return x > self._x - half_size and x < self._x + self._width + half_size and y > self._y - half_size and y < self._y + self._height + half_size
 
     def update(self, delta_time):
         pass
