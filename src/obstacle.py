@@ -13,7 +13,6 @@ class Obstacle(abc.ABC):
         self._y = y
         self._width = width
         self._height = height
-        self._shape = None
 
     @property
     def X(self):
@@ -31,16 +30,16 @@ class Obstacle(abc.ABC):
     def Height(self):
         return self._height
 
-    @abc.abstractmethod
     def collide(self, x, y, half_size):
-        pass
+        return x > self._x - half_size and x < self._x + self._width + half_size and y > self._y - half_size and y < self._y + self._height + half_size
 
     @abc.abstractmethod
     def update(self, delta_time):
         pass
 
+    @abc.abstractmethod
     def draw(self):
-        self._shape.draw()
+        pass
         
 class Wall(Obstacle):
 
@@ -54,9 +53,9 @@ class Wall(Obstacle):
             height, 
             color)
 
-    def collide(self, x, y, half_size):
-        return x > self._x - half_size and x < self._x + self._width + half_size and y > self._y - half_size and y < self._y + self._height + half_size
-
     def update(self, delta_time):
         pass
+
+    def draw(self):
+        self._shape.draw()
 
