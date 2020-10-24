@@ -1,4 +1,5 @@
 import abc
+import arcade
 from enum import Enum, auto
 from shape import Rectangle
 
@@ -7,6 +8,7 @@ class Obstacle(abc.ABC):
 
     class type(Enum):
         Wall = auto()
+        LockedWall = auto()
 
     def __init__(self, x, y, width, height, color):
         self._x = x
@@ -59,3 +61,10 @@ class Wall(Obstacle):
     def draw(self):
         self._shape.draw()
 
+class LockedWall(Wall):
+    def __init__(self, x, y, width, height):
+        color = arcade.color.RED_DEVIL
+        super().__init__(x, y, width, height, color)
+
+    def collide(self, x, y, half_size):
+        return False

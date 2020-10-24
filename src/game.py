@@ -4,7 +4,7 @@ import math
 import random
 from shape import Rectangle, Ellipse
 from game_object import GameObject
-from obstacle import Obstacle, Wall
+from obstacle import Obstacle, Wall, LockedWall
 from player import Player
 from npc import Npc
 from wanderer import Wanderer
@@ -29,10 +29,11 @@ History
     - create Life player stat and Game Over screen when dead - DONE
     - create NPCs with psychical aptitudes the guard let pass (NPC + aptitude mask) - DONE
 
-- Level 3: the safe - TODO
-    - create safe = obstacle with aptitude mask
-    - one for intelligence
-    - one for speed (laser beam)
+- Level 3: the safe
+    - create configurable obstacles - DONE
+    - create safe = obstacle with aptitude mask - TODO
+        - one for intelligence - TODO
+        - one for speed (laser beam) - TODO
 
 - Level 4: TODO
     - add metabolism and energy stat - TODO 
@@ -56,7 +57,7 @@ PLAYER_INIT_LIFE = 1000
 # --- Game levels ---
 
 LEVEL_1 = {
-    'name': 'Level 1',
+    'name': 'Level 1: train!',
     'map': {
         'color1':(5,10,5), 
         'color2':(20,40,20)
@@ -74,7 +75,7 @@ LEVEL_1 = {
 
 
 LEVEL_2 = {
-    'name': 'Level 2',
+    'name': 'Level 2: The Guard...',
     'map' : {
         'color1':(10,5,5), 
         'color2':(40,20,20),
@@ -111,7 +112,7 @@ LEVEL_2 = {
 }
 
 LEVEL_3 = {
-    'name': 'Level 3',
+    'name': 'Level 3: The Safe...',
     'map' : {
         'color1':(5,5,10), 
         'color2':(20,20,40),
@@ -125,6 +126,10 @@ LEVEL_3 = {
                 'class':Obstacle.type.Wall,
                 'color':arcade.color.BLUE_GREEN,
                 'area':(SCREEN_WIDTH/2-100, SCREEN_HEIGHT/2 - 100, 200, 40) # rectangle is (x, y, width, height)
+            },
+            {
+                'class':Obstacle.type.LockedWall,
+                'area':(SCREEN_WIDTH/2-100, SCREEN_HEIGHT/2-100+40, 40, 160)
             },
         ]
     },
@@ -188,12 +193,14 @@ class GameView(arcade.View):
                 for obstacle in map_dict['obstacles']:
                     if 'class' in obstacle:
                         obs_class = obstacle['class']
-                        if 'color' in obstacle:
-                            obs_color = obstacle['color']
-                            if 'area' in obstacle:
-                                (x, y, width, height) = obstacle['area']
-                                if obs_class == Obstacle.type.Wall:
+                        if 'area' in obstacle:
+                            (x, y, width, height) = obstacle['area']
+                            if obs_class == Obstacle.type.Wall:
+                                if 'color' in obstacle:
+                                    obs_color = obstacle['color']
                                     self._map.append(Wall(x, y, width, height, obs_color))
+                            elif obs_class == Obstacle.type.LockedWall:
+                                self._map.append(LockedWall(x, y, width, height))
 
         # load player
         if 'player' in level:
@@ -235,7 +242,7 @@ class GameView(arcade.View):
                                         x, 
                                         y, 
                                         area))
-                                if npc_class == Npc.type.Wanderer:
+                                elif npc_class == Npc.type.Wanderer:
                                     self._npcs.append(Wanderer(
                                         x, 
                                         y, 
