@@ -37,16 +37,27 @@ class Arrow(Shape):
 
 
 class Rectangle(Shape):
-    def __init__(self, x, y, angle, width, height, color):
+    def __init__(self, x, y, angle, width, height, color, outline=0):
         super().__init__(x, y, angle, width, height, color)
         self._shape_list = arcade.ShapeElementList()
-        self._shape_list.append(arcade.create_rectangle_filled(
-            0, 0, 
-            self._width, 
-            self._height, 
-            self._color, 
-            self._angle)
-        )
+        if outline == 0:
+            self._shape_list.append(arcade.create_rectangle_filled(
+                0, 0, 
+                self._width, 
+                self._height, 
+                self._color, 
+                self._angle)
+            )
+        else:
+            self._shape_list.append(arcade.create_rectangle_outline(
+                0, 0, 
+                self._width, 
+                self._height, 
+                self._color, 
+                outline,
+                self._angle)
+            )
+
 
 
 class Ellipse(Shape):

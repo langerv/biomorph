@@ -4,7 +4,7 @@ import math
 import random
 from shape import Rectangle, Ellipse
 from game_object import GameObject
-from obstacle import Obstacle, Wall, LockedWall
+from obstacle import Obstacle, Wall, LockedWall, LaserBeam
 from player import Player
 from npc import Npc
 from wanderer import Wanderer
@@ -57,7 +57,7 @@ PLAYER_INIT_LIFE = 1000
 # --- Game levels ---
 
 LEVEL_1 = {
-    'name': 'Level 1: train!',
+    'name': 'Level 1',
     'map': {
         'color1':(5,10,5), 
         'color2':(20,40,20)
@@ -75,7 +75,7 @@ LEVEL_1 = {
 
 
 LEVEL_2 = {
-    'name': 'Level 2: The Guard...',
+    'name': 'Level 2',
     'map' : {
         'color1':(10,5,5), 
         'color2':(40,20,20),
@@ -112,7 +112,7 @@ LEVEL_2 = {
 }
 
 LEVEL_3 = {
-    'name': 'Level 3: The Safe...',
+    'name': 'Level 3',
     'map' : {
         'color1':(5,5,10), 
         'color2':(20,20,40),
@@ -130,6 +130,11 @@ LEVEL_3 = {
             {
                 'class':Obstacle.type.LockedWall,
                 'area':(SCREEN_WIDTH/2-100, SCREEN_HEIGHT/2-100+40, 40, 160)
+            },
+            {
+                'class':Obstacle.type.LaserBeam,
+                'color':arcade.color.RED,
+                'area':(SCREEN_WIDTH/2+100-40, SCREEN_HEIGHT/2-100+40, 40, 160)
             },
         ]
     },
@@ -194,13 +199,16 @@ class GameView(arcade.View):
                     if 'class' in obstacle:
                         obs_class = obstacle['class']
                         if 'area' in obstacle:
+                            obs_color = arcade.color.WHITE
+                            if 'color' in obstacle:
+                                obs_color = obstacle['color']
                             (x, y, width, height) = obstacle['area']
                             if obs_class == Obstacle.type.Wall:
-                                if 'color' in obstacle:
-                                    obs_color = obstacle['color']
-                                    self._map.append(Wall(x, y, width, height, obs_color))
+                                self._map.append(Wall(x, y, width, height, obs_color))
                             elif obs_class == Obstacle.type.LockedWall:
                                 self._map.append(LockedWall(x, y, width, height))
+                            elif obs_class == Obstacle.type.LaserBeam:
+                                self._map.append(LaserBeam(x, y, width, height, obs_color))
 
         # load player
         if 'player' in level:
@@ -439,7 +447,6 @@ class GameView(arcade.View):
         if button == arcade.MOUSE_BUTTON_LEFT:
             # check is buttons have been clicked
             if self._button_hover is not None:
-
                 # Game flow to refactor
                 if self._button_hover.Type == ButtonType.arrow_right:
                     if self._level == LEVEL_1:
@@ -462,11 +469,14 @@ class GameView(arcade.View):
 
         # in a game over state, just relaunch the same scene
         if self._game_over is True:
-
             # Game flow to refactor
             if self._level == LEVEL_2:
                 start_view = GameView()
                 start_view.setup(LEVEL_2, LEVEL_3, LEVEL_1)
+                self.window.show_view(start_view)
+            if self._level == LEVEL_3:
+                start_view = GameView()
+                start_view.setup(LEVEL_3, None, LEVEL_2)
                 self.window.show_view(start_view)
 
         # test if we've hit a npc
