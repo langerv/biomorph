@@ -31,9 +31,9 @@ History
 
 - Level 3: the safe
     - create configurable obstacles - DONE
-    - create safe = obstacle with aptitude mask - TODO
-        - one for intelligence - TODO
-        - one for speed (laser beam) - TODO
+    - create safe = obstacle with aptitude mask
+        - one for intelligence
+        - one for speed (laser beam)
 
 - Level 4: TODO
     - add metabolism and energy stat - TODO 
@@ -79,6 +79,18 @@ LEVEL_2 = {
     'map' : {
         'color1':(10,5,5), 
         'color2':(40,20,20),
+        'text' : [
+            {
+                'anchor':(SCREEN_WIDTH/4, SCREEN_HEIGHT - 70),
+                'color':arcade.color.WHITE_SMOKE,
+                'text': 'GO HERE!'
+            },
+            {
+                'anchor':(SCREEN_WIDTH*3/4, SCREEN_HEIGHT - 70),
+                'color':arcade.color.WHITE_SMOKE,
+                'text': 'GO HERE!'
+            }
+        ],
         'obstacles' : [
             {
                 'class':Obstacle.type.Wall,
@@ -111,30 +123,38 @@ LEVEL_2 = {
     ]
 }
 
+
 LEVEL_3 = {
     'name': 'Level 3',
     'map' : {
         'color1':(5,5,10), 
         'color2':(20,20,40),
+        'text' : [
+            {
+                'anchor':(SCREEN_WIDTH/2, SCREEN_HEIGHT/2),
+                'color':arcade.color.WHITE_SMOKE,
+                'text': 'GO HERE!'
+            }
+        ],
         'obstacles' : [
             {
                 'class':Obstacle.type.Wall,
                 'color':arcade.color.BLUE_GREEN,
-                'area':(SCREEN_WIDTH/2-100, SCREEN_HEIGHT/2 + 100, 200, 40) # rectangle is (x, y, width, height)
+                'area':(SCREEN_WIDTH/2 - 100, SCREEN_HEIGHT/2 + 100, 200, 40) # area is (x, y, width, height)
             },
             {
                 'class':Obstacle.type.Wall,
                 'color':arcade.color.BLUE_GREEN,
-                'area':(SCREEN_WIDTH/2-100, SCREEN_HEIGHT/2 - 100, 200, 40) # rectangle is (x, y, width, height)
+                'area':(SCREEN_WIDTH/2 - 100, SCREEN_HEIGHT/2 - 100, 200, 40)
             },
             {
                 'class':Obstacle.type.LockedWall,
-                'area':(SCREEN_WIDTH/2-100, SCREEN_HEIGHT/2-100+40, 40, 160)
+                'area':(SCREEN_WIDTH/2 - 100, SCREEN_HEIGHT/2 - 100 + 40, 40, 160)
             },
             {
                 'class':Obstacle.type.LaserBeam,
-                'color':arcade.color.RED,
-                'area':(SCREEN_WIDTH/2+100-40, SCREEN_HEIGHT/2-100+40, 40, 160)
+                'color':arcade.color.BLUE_VIOLET,
+                'area':(SCREEN_WIDTH/2 + 100 - 40, SCREEN_HEIGHT/2 - 100 + 40, 40, 160)
             },
         ]
     },
@@ -144,9 +164,24 @@ LEVEL_3 = {
     'npc' : [
         {
             'class': Npc.type.Wanderer,
-            'quantity':30,
-            'area':(WORLD_XMIN, WORLD_YMIN, WORLD_XMAX, WORLD_YMAX)
-        }
+            'quantity':10,
+            'area':(WORLD_XMIN, WORLD_YMIN, SCREEN_WIDTH/2 - 140, WORLD_YMAX)
+        },
+        {
+            'class': Npc.type.Wanderer,
+            'quantity':10,
+            'area':(SCREEN_WIDTH/2 + 140, WORLD_YMIN, WORLD_XMAX, WORLD_YMAX)
+        },
+        {
+            'class': Npc.type.Wanderer,
+            'quantity':10,
+            'area':(WORLD_XMIN, WORLD_YMIN, WORLD_XMAX, SCREEN_HEIGHT/2 - 140)
+        },
+        {
+            'class': Npc.type.Wanderer,
+            'quantity':10,
+            'area':(WORLD_XMIN, SCREEN_HEIGHT/2 + 170, WORLD_XMAX, WORLD_YMAX)
+        },
     ]
 }
 
@@ -183,6 +218,7 @@ class GameView(arcade.View):
 
         # load and create map
         self._map = []
+        self._texts = []
         if 'map' in level:
             map_dict = level['map']
             if 'color1' in map_dict:
@@ -193,6 +229,15 @@ class GameView(arcade.View):
                     colors = (color1, color1, color2, color2)
                     rect = arcade.create_rectangle_filled_with_colors(points, colors)
                     self._background_shape.append(rect)
+
+            if 'text' in map_dict:
+                for text in map_dict['text']:
+                    if 'color' in text:
+                        text_color = text['color']
+                        if 'anchor' in text:
+                            (x, y) = text['anchor']
+                            if 'text' in text:
+                                self._texts.append((text['text'], x, y, text_color))
 
             if 'obstacles' in map_dict:
                 for obstacle in map_dict['obstacles']:
@@ -300,15 +345,25 @@ class GameView(arcade.View):
                 total_time = timeit.default_timer() - self._fps_start_timer
                 self._fps = 60 / total_time
             self._fps_start_timer = timeit.default_timer()
+
         self._frame_count += 1
+
+        if self._frame_count % 20 == 0:
+            self._blink = not self._blink
 
         # render game stuffs
         arcade.start_render()
 
         # render map
         self._background_shape.draw()
+
         for map_elt in self._map:
             map_elt.draw()
+
+        if self._blink is True and self._game_over is False:
+            # display text boxes
+            for (txt, x, y, color) in self._texts:
+                arcade.draw_text(txt, x, y, color, 14, anchor_x='center', anchor_y='center')
 
         # draw perception lines between player and perceived shapes
         line_list = arcade.ShapeElementList()
@@ -350,9 +405,6 @@ class GameView(arcade.View):
             if self._font_angle >= 363:
                 self._font_angle = 3
                 self._font_angle_delta = 0
-
-            if self._frame_count % 20 == 0:
-                self._blink = not self._blink
 
             arcade.draw_text(
                 "GAME OVER!\n", 

@@ -37,13 +37,13 @@ class Wanderer(Npc):
                 self._hit = False
         else:
             # wander
-            if self._shape._x < self._area[0] and self._dx < 0:
+            if self._shape._x <= self._area[0] and self._dx < 0:
                 self._dx *= -1
-            elif self._shape._x > self._area[2] and self._dx > 0:
+            elif self._shape._x >= self._area[2] and self._dx > 0:
                 self._dx *= -1
-            elif self._shape._y < self._area[1] and self._dy < 0:
+            elif self._shape._y <= self._area[1] and self._dy < 0:
                 self._dy *= -1
-            elif self._shape._y > self._area[3] and self._dy > 0:
+            elif self._shape._y >= self._area[3] and self._dy > 0:
                 self._dy *= -1
             else:
                 self.move(self._dx, self._dy)

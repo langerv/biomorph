@@ -44,16 +44,16 @@ class Habitant(Npc):
                 self._hit_time = 0
                 self._hit = False
         else:
-            if self._shape._x < self._area[0] and self._dir_x < 0:
+            if self._shape._x <= self._area[0] and self._dir_x < 0:
                 self._dir_x = 0
                 self._dir_y = -self._dy
-            elif self._shape._x > self._area[2] and self._dir_x > 0:
+            elif self._shape._x >= self._area[2] and self._dir_x > 0:
                 self._dir_x = 0
                 self._dir_y = self._dy
-            elif self._shape._y < self._area[1] and self._dir_y < 0:
+            elif self._shape._y <= self._area[1] and self._dir_y < 0:
                 self._dir_x = self._dx
                 self._dir_y = 0
-            elif self._shape._y > self._area[3] and self._dir_y > 0:
+            elif self._shape._y >= self._area[3] and self._dir_y > 0:
                 self._dir_x = -self._dx
                 self._dir_y = 0
             else:

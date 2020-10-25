@@ -56,6 +56,9 @@ class Npc(Character, GameObject):
     def Hit(self, value):
         self._hit = value
 
+    def hurt(self, hit_points):
+        pass
+
     ''' percepts'''
     def in_area(self, x, y):
         return x >= self._area[0] and x <= self._area[2] and y >= self._area[1] and y <= self._area[3]

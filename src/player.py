@@ -92,7 +92,7 @@ class Player(Biomorph, GameObject):
     def Target(self, target):
         self._morph_target = target
 
-    def hit(self, hit_points):
+    def hurt(self, hit_points):
         self._life = max(self._life - hit_points, 0)
 
     def move_to(self, goal):
