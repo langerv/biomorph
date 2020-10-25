@@ -34,8 +34,8 @@ class Player(Biomorph, GameObject):
         self._life = life
 
         # define aptitudes
-        self.set_aptitude(PhysicalAptitudes.PERC, 1)
-        self.set_aptitude(PhysicalAptitudes.MOVE, 1)
+        self.set_aptitude(PhysicalAptitudes.PERC, 5)
+        self.set_aptitude(PhysicalAptitudes.MOVE, 5)
         self.set_aptitude(PhysicalAptitudes.CONS, 1)
         self.set_aptitude(PsychicalAptitudes.INTL, 1)
         self.set_aptitude(PsychicalAptitudes.CHAR, 1)
