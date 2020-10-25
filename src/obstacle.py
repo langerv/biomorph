@@ -123,7 +123,7 @@ class LaserBeam(Obstacle):
         return self._shape._color
 
     def get_hint(self):
-        return "SPEED > 3"
+        return "MOVE > 3"
 
     def collide(self, x, y, object):
         if super().collide(x, y, object) is True:
