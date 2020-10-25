@@ -2,7 +2,7 @@ import abc
 import arcade
 import random
 from enum import Enum, auto
-from shape import Rectangle
+from shape import Rectangle, Ellipse
 from aptitude import PsychicalAptitudes
 
 
@@ -65,13 +65,13 @@ class Wall(Obstacle):
     def draw(self):
         self._shape.draw()
 
+
 class LockedWall(Wall):
 
     UNLOCK_INT_MIN = 4
 
     def __init__(self, x, y, width, height):
-        color = arcade.color.GREEN_YELLOW
-        super().__init__(x, y, width, height, color)
+        super().__init__(x, y, width, height, arcade.color.GREEN_YELLOW)
 
     def collide(self, x, y, object):
         if super().collide(x, y, object) is True:
@@ -79,10 +79,12 @@ class LockedWall(Wall):
                 return True
         return False
 
+
 class LaserBeam(Obstacle):
 
     HIT_POINTS_LASER = 200
     LASER_SPEED = 12
+    LASER_COLOR = arcade.color.VIOLET_RED
 
     def __init__(self, x, y, width, height, color):
         super().__init__(x, y, width, height)
@@ -123,6 +125,7 @@ class LaserBeam(Obstacle):
     def draw(self):
         self._shape.draw()
         point_list = (
+            # with width = 40
             (self._x, self._y_beam),
             (self._x + 5, self._y_beam  + 5*(0.5 - random.random()) ),
             (self._x + 10, self._y_beam + 10*(0.5 - random.random()) ),
@@ -132,4 +135,4 @@ class LaserBeam(Obstacle):
             (self._x + 32, self._y_beam + 6*(0.5 - random.random()) ),
             (self._x + 40, self._y_beam)
         )
-        arcade.draw_line_strip(point_list, arcade.color.VIOLET_RED, 2)
+        arcade.draw_line_strip(point_list, LaserBeam.LASER_COLOR, 2)
