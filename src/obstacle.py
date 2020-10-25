@@ -35,9 +35,16 @@ class Obstacle(abc.ABC):
     def Height(self):
         return self._height
 
+    def get_hint(self):
+        return None
+
     def collide(self, x, y, object):
         half_size = object.Size/2
         return x >= self._x - half_size and x <= self._x + self._width + half_size and y >= self._y - half_size and y <= self._y + self._height + half_size
+
+    @abc.abstractmethod
+    def get_color(self):
+        pass
 
     @abc.abstractmethod
     def update(self, delta_time):
@@ -59,6 +66,15 @@ class Wall(Obstacle):
             height, 
             color)
 
+    '''
+    for testing vertical hints
+    def get_hint(self):
+        return "Wall"
+    '''
+
+    def get_color(self):
+        return self._shape._color
+
     def update(self, delta_time):
         pass
 
@@ -72,6 +88,9 @@ class LockedWall(Wall):
 
     def __init__(self, x, y, width, height):
         super().__init__(x, y, width, height, arcade.color.GREEN_YELLOW)
+
+    def get_hint(self):
+        return f"INT > {LockedWall.UNLOCK_INT_MIN - 1}"
 
     def collide(self, x, y, object):
         if super().collide(x, y, object) is True:
@@ -100,10 +119,18 @@ class LaserBeam(Obstacle):
             color, 
             1)
 
+    def get_color(self):
+        return self._shape._color
+
+    def get_hint(self):
+        return "SPEED > 3"
+
     def collide(self, x, y, object):
         if super().collide(x, y, object) is True:
             self._target = object
         else:
+            # to refactor if we can have other targets than the player, use a list instead to keep track
+            # of the ones inside the LaserBeam area
             self._target = None
         return False
 

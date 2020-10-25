@@ -20,8 +20,7 @@ History
 - Add base aptitudes for characaters and biomorph - DONE
 
 - Level1 : morph training
-    - spawn various wanderer NPCs and logic fir morph - DONE
-    - make a better distribution of aptitudes among NPCs - TODO
+    - spawn various wanderer NPCs and logic for morph - DONE
 
 - Level 2: the guard
     - create obstacles - DONE
@@ -34,8 +33,10 @@ History
     - create safe = obstacle with aptitude mask
         - one for intelligence
         - one for speed (laser beam)
+    - add hint for players
 
-- Level 4: TODO
+- other ideas
+    - make a better distribution of aptitudes among NPCs - TODO
     - add metabolism and energy stat - TODO 
     - add food and eat logic - TODO
 
@@ -131,9 +132,9 @@ LEVEL_3 = {
         'color2':(20,20,40),
         'text' : [
             {
-                'anchor':(SCREEN_WIDTH/2, SCREEN_HEIGHT/2),
+                'anchor':(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + 20),
                 'color':arcade.color.WHITE_SMOKE,
-                'text': 'GO HERE!'
+                'text': '1) GO HERE...\n\n2) GET OUT!'
             }
         ],
         'obstacles' : [
@@ -202,6 +203,7 @@ class GameView(arcade.View):
         self._total_time = 0.0        
         self._npcs = None
         self._player_neighbours = []
+        self._player_hint = None
         #  game over variable and effect
         self._game_over = False
         self._blink = False
@@ -360,13 +362,29 @@ class GameView(arcade.View):
         for map_elt in self._map:
             map_elt.draw()
 
-        if self._blink is True and self._game_over is False:
-            # display text boxes
-            for (txt, x, y, color) in self._texts:
-                arcade.draw_text(txt, x, y, color, 14, anchor_x='center', anchor_y='center')
-
         # draw perception lines between player and perceived shapes
         line_list = arcade.ShapeElementList()
+
+        if self._player_hint is not None:
+            (map_elt, x, y) = self._player_hint
+
+            line_list.append(arcade.create_line(
+                self._player.X, 
+                self._player.Y,
+                x, 
+                y,
+                map_elt.get_color(),
+                2))
+
+            arcade.draw_text(
+                map_elt.get_hint(), 
+                (self._player.X + x)/2, 
+                (self._player.Y + y)/2 + 14,
+                arcade.color.WHITE,
+                12,
+                anchor_x="center",
+                anchor_y="center")
+
         for (npc, squared_dist) in self._player_neighbours:
             if squared_dist > 0:
                 line_list.append(arcade.create_line(
@@ -395,6 +413,7 @@ class GameView(arcade.View):
             button.draw()
 
         # game over screen
+        # must be done after button check
         if self._game_over is True:
             
             self._font_size += self._font_size_delta
@@ -425,6 +444,11 @@ class GameView(arcade.View):
                     font_size=20, 
                     anchor_x="center",
                     rotation=-3)
+
+        elif self._blink is True:
+            # display text boxes
+            for (txt, x, y, color) in self._texts:
+                arcade.draw_text(txt, x, y, color, 14, anchor_x='center', anchor_y='center')
 
         # display game infos
         arcade.draw_text(
@@ -560,9 +584,42 @@ class GameView(arcade.View):
         # update player
         self._player.update(delta_time)
 
+        # update perceived data
+        squared_vision = self._player.Vision**2
+
+        # update with any hints from map
+        closest_hint = None
+        distmin = squared_vision
+        for map_elt in self._map:
+            hint = map_elt.get_hint()
+            if hint is not None:
+                x = self._player.X
+                y = self._player.Y
+
+                if x >= map_elt.X and x <= map_elt.X + map_elt.Width:
+                    dy1 = abs(map_elt.Y - y)
+                    dy2 = abs(map_elt.Y + map_elt.Height - y)
+                    if dy1 <= dy2 and dy1**2 < distmin:
+                        closest_hint = (map_elt, x, map_elt.Y)
+                        distmin = dy1**2
+                    if dy1 > dy2 and dy2**2 < distmin:
+                        closest_hint = (map_elt, x, map_elt.Y + map_elt.Height)
+                        distmin = dy2**2
+
+                if y >= map_elt.Y and y <= map_elt.Y + map_elt.Height:
+                    dx1 = abs(map_elt.X - x)
+                    dx2 = abs(map_elt.X + map_elt.Width - x)
+                    if dx1 <= dx2 and dx1**2 < distmin:
+                        closest_hint = (map_elt, map_elt.X, y)
+                        distmin = dx1**2
+                    if dx1 > dx2 and dx2**2 < distmin:
+                        closest_hint = (map_elt, map_elt.X + map_elt.Width, y)
+                        distmin = dx2**2
+
+        self._player_hint = closest_hint if closest_hint is not None else None
+
         # update NPCs and compute player's neigbourhood
         self._player_neighbours = []
-        squared_vision = self._player.Vision**2
         for npc in self._npcs:
             npc.update([self._player], delta_time)
             if npc.X > 0 and npc.Y < SCREEN_WIDTH and npc.Y > 0 and npc.Y < SCREEN_HEIGHT: # cannot be perceived outside of screen  boundaries
