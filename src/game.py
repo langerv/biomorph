@@ -591,28 +591,29 @@ class GameView(arcade.View):
         closest_hint = None
         distmin = squared_vision
         for map_elt in self._map:
+            hint = map_elt.get_hint()
             x = self._player.X
             y = self._player.Y
             if x >= map_elt.X and x <= map_elt.X + map_elt.Width:
                 dy1 = abs(map_elt.Y - y)
                 dy2 = abs(map_elt.Y + map_elt.Height - y)
                 if dy1 <= dy2 and dy1**2 < distmin:
-                    if map_elt.get_hint() is not None:
+                    if hint is not None:
                         closest_hint = (map_elt, x, map_elt.Y)
                     distmin = dy1**2
                 if dy1 > dy2 and dy2**2 < distmin:
-                    if map_elt.get_hint() is not None:
+                    if hint is not None:
                         closest_hint = (map_elt, x, map_elt.Y + map_elt.Height)
                     distmin = dy2**2
             elif y >= map_elt.Y and y <= map_elt.Y + map_elt.Height:
                 dx1 = abs(map_elt.X - x)
                 dx2 = abs(map_elt.X + map_elt.Width - x)
                 if dx1 <= dx2 and dx1**2 < distmin:
-                    if map_elt.get_hint() is not None:
+                    if hint is not None:
                         closest_hint = (map_elt, map_elt.X, y)
                     distmin = dx1**2
                 if dx1 > dx2 and dx2**2 < distmin:
-                    if map_elt.get_hint() is not None:
+                    if hint is not None:
                         closest_hint = (map_elt, map_elt.X + map_elt.Width, y)
                     distmin = dx2**2
         else:
