@@ -90,7 +90,7 @@ class LockedWall(Wall):
         super().__init__(x, y, width, height, arcade.color.GREEN_YELLOW)
 
     def get_hint(self):
-        return f"INT > {LockedWall.UNLOCK_INT_MIN - 1}"
+        return f"INT > {LockedWall.UNLOCK_INT_MIN}"
 
     def collide(self, x, y, object):
         if super().collide(x, y, object) is True:
