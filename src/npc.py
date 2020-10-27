@@ -3,6 +3,17 @@ from enum import Enum, auto
 from game_object import GameObject
 from character import Character
 
+
+'''
+NPC types
+'''
+
+class NpcType(Enum):
+    Habitant = auto()
+    Wanderer = auto()
+    Guard = auto()
+
+
 '''
 NPC class
 '''
@@ -10,11 +21,6 @@ NPC class
 class Npc(Character, GameObject):
 
     HIT_TIMER = 5 # number of seconds before a hit npc goes back to life
-
-    class type(Enum):
-        Habitant = auto()
-        Wanderer = auto()
-        Guard = auto()
 
     def __init__(self, x, y, area):
         Character.__init__(self)
@@ -51,7 +57,7 @@ class Npc(Character, GameObject):
     def Hit(self, value):
         self._hit = value
 
-    ''' percepts'''
+    ''' common percepts'''
     def in_area(self, x, y):
         return x >= self._area[0] and x <= self._area[2] and y >= self._area[1] and y <= self._area[3]
 
@@ -64,7 +70,7 @@ class Npc(Character, GameObject):
                 self._hit_time = 0
                 self._hit = False
 
-    ''' actions '''
+    ''' common basic actions '''
     def look_at(self, x, y):
         dx = x - self._shape._x
         dy = y - self._shape._y

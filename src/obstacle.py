@@ -6,16 +6,22 @@ from shape import Rectangle, Ellipse
 from aptitude import PsychicalAptitudes
 
 
+
+'''
+Obstacles types
+'''
+
+class ObstacleType(Enum):
+    Wall = auto()
+    LockedWall = auto()
+    LaserBeam = auto()
+
+
 '''
 Base class for obstacles
 '''
 
 class Obstacle(abc.ABC):
-
-    class type(Enum):
-        Wall = auto()
-        LockedWall = auto()
-        LaserBeam = auto()
 
     def __init__(self, x, y, width, height):
         self._x = x

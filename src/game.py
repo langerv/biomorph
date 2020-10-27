@@ -4,9 +4,9 @@ import math
 import random
 from shape import Rectangle, Ellipse
 from game_object import GameObject
-from obstacle import Obstacle, Wall, LockedWall, LaserBeam
+from obstacle import ObstacleType, Wall, LockedWall, LaserBeam
 from player import Player
-from npc import Npc
+from npc import NpcType
 from wanderer import Wanderer
 from guard import Guard
 from habitant import Habitant
@@ -63,7 +63,7 @@ LEVEL_1 = {
         },
     'npc' : [
         {
-            'class': Npc.type.Wanderer,
+            'class': NpcType.Wanderer,
             'quantity':30, 
             'area':(WORLD_XMIN, WORLD_YMIN, WORLD_XMAX, WORLD_YMAX)}
     ]
@@ -89,12 +89,12 @@ LEVEL_2 = {
         ],
         'obstacles' : [
             {
-                'class':Obstacle.type.Wall,
+                'class':ObstacleType.Wall,
                 'color':arcade.color.BLUE_GREEN,
                 'area':(0, SCREEN_HEIGHT - 190, 300, 40) # area is (x, y, width, height)
             },
             {
-                'class':Obstacle.type.Wall,
+                'class':ObstacleType.Wall,
                 'color':arcade.color.BLUE_GREEN,
                 'area':(SCREEN_WIDTH - 300, SCREEN_HEIGHT - 190, 300, 40)
             }
@@ -105,15 +105,15 @@ LEVEL_2 = {
         },
     'npc' : [
         {
-            'class': Npc.type.Habitant,
+            'class': NpcType.Habitant,
             'quantity':3,
             'area':(350, WORLD_YMIN, 450, WORLD_YMAX)},
         {
-            'class': Npc.type.Wanderer,
+            'class': NpcType.Wanderer,
             'quantity':30, 
             'area':(WORLD_XMIN, WORLD_YMIN, WORLD_XMAX, 400)},
         {
-            'class': Npc.type.Guard,
+            'class': NpcType.Guard,
             'quantity':1,
             'area':(330, SCREEN_HEIGHT - 145, 470, SCREEN_HEIGHT - 105)}
     ]
@@ -134,21 +134,21 @@ LEVEL_3 = {
         ],
         'obstacles' : [
             {
-                'class':Obstacle.type.Wall,
+                'class':ObstacleType.Wall,
                 'color':arcade.color.BLUE_GREEN,
                 'area':(SCREEN_WIDTH/2 - 100, SCREEN_HEIGHT/2 + 100, 200, 40) # area is (x, y, width, height)
             },
             {
-                'class':Obstacle.type.Wall,
+                'class':ObstacleType.Wall,
                 'color':arcade.color.BLUE_GREEN,
                 'area':(SCREEN_WIDTH/2 - 100, SCREEN_HEIGHT/2 - 100, 200, 40)
             },
             {
-                'class':Obstacle.type.LockedWall,
+                'class':ObstacleType.LockedWall,
                 'area':(SCREEN_WIDTH/2 - 100, SCREEN_HEIGHT/2 - 100 + 40, 40, 160)
             },
             {
-                'class':Obstacle.type.LaserBeam,
+                'class':ObstacleType.LaserBeam,
                 'color':arcade.color.BLUE_VIOLET,
                 'area':(SCREEN_WIDTH/2 + 100 - 40, SCREEN_HEIGHT/2 - 100 + 40, 40, 160)
             },
@@ -159,22 +159,22 @@ LEVEL_3 = {
     },
     'npc' : [
         {
-            'class': Npc.type.Wanderer,
+            'class': NpcType.Wanderer,
             'quantity':10,
             'area':(WORLD_XMIN, WORLD_YMIN, SCREEN_WIDTH/2 - 140, WORLD_YMAX)
         },
         {
-            'class': Npc.type.Wanderer,
+            'class': NpcType.Wanderer,
             'quantity':10,
             'area':(SCREEN_WIDTH/2 + 140, WORLD_YMIN, WORLD_XMAX, WORLD_YMAX)
         },
         {
-            'class': Npc.type.Wanderer,
+            'class': NpcType.Wanderer,
             'quantity':10,
             'area':(WORLD_XMIN, WORLD_YMIN, WORLD_XMAX, SCREEN_HEIGHT/2 - 140)
         },
         {
-            'class': Npc.type.Wanderer,
+            'class': NpcType.Wanderer,
             'quantity':10,
             'area':(WORLD_XMIN, SCREEN_HEIGHT/2 + 170, WORLD_XMAX, WORLD_YMAX)
         },
@@ -246,11 +246,11 @@ class GameView(arcade.View):
                             if 'color' in obstacle:
                                 obs_color = obstacle['color']
                             (x, y, width, height) = obstacle['area']
-                            if obs_class == Obstacle.type.Wall:
+                            if obs_class == ObstacleType.Wall:
                                 self._map.append(Wall(x, y, width, height, obs_color))
-                            elif obs_class == Obstacle.type.LockedWall:
+                            elif obs_class == ObstacleType.LockedWall:
                                 self._map.append(LockedWall(x, y, width, height))
-                            elif obs_class == Obstacle.type.LaserBeam:
+                            elif obs_class == ObstacleType.LaserBeam:
                                 self._map.append(LaserBeam(x, y, width, height, obs_color))
 
         # load player
@@ -288,17 +288,17 @@ class GameView(arcade.View):
                             for _ in range(num):
                                 x = random.randrange(area[0], area[2])
                                 y = random.randrange(area[1], area[3])
-                                if npc_class == Npc.type.Habitant:
+                                if npc_class == NpcType.Habitant:
                                     self._npcs.append(Habitant(
                                         x, 
                                         y, 
                                         area))
-                                elif npc_class == Npc.type.Wanderer:
+                                elif npc_class == NpcType.Wanderer:
                                     self._npcs.append(Wanderer(
                                         x, 
                                         y, 
                                         area))
-                                elif npc_class == Npc.type.Guard:
+                                elif npc_class == NpcType.Guard:
                                     self._npcs.append(Guard(
                                         x, 
                                         y, 
