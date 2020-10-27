@@ -6,6 +6,10 @@ from shape import Rectangle, Ellipse
 from aptitude import PsychicalAptitudes
 
 
+'''
+Base class for obstacles
+'''
+
 class Obstacle(abc.ABC):
 
     class type(Enum):
@@ -53,7 +57,12 @@ class Obstacle(abc.ABC):
     @abc.abstractmethod
     def draw(self):
         pass
-        
+
+
+'''
+Class for Walls 
+'''
+
 class Wall(Obstacle):
 
     def __init__(self, x, y, width, height, color):
@@ -82,6 +91,10 @@ class Wall(Obstacle):
         self._shape.draw()
 
 
+'''
+Class for Locked Wall
+'''
+
 class LockedWall(Wall):
 
     UNLOCK_INT_MIN = 4
@@ -98,6 +111,10 @@ class LockedWall(Wall):
                 return True
         return False
 
+
+'''
+Class for Laser beam
+'''
 
 class LaserBeam(Obstacle):
 
