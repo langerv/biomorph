@@ -46,14 +46,9 @@ class GameObject(abc.ABC):
         half_size = self._size/2
         return x >= (self._shape._x - half_size) and x <= (self._shape._x + half_size) and y >= (self._shape._y - half_size) and y <= (self._shape._y + half_size)
 
-    @abc.abstractmethod
-    def hurt(self, hit_points):
-        pass
+    def draw(self):
+        self._shape.draw()
 
     @abc.abstractmethod
     def update(self, delta_time):
         pass
-
-    def draw(self):
-        self._shape.draw()
-        

@@ -29,21 +29,17 @@ class Wanderer(Npc):
         self._shape = Rectangle(x, y, 0, self._size, self._size, self._color)
  
     def update(self, neighbours, delta_time):
-        if self._hit is True:
-            # if a npc is hit, we compute time before to get it back to life
-            self._hit_time += delta_time
-            if int(self._hit_time) % 60 > Npc.HIT_TIMER:
-                self._hit_time = 0
-                self._hit = False
+        Npc.update(self, delta_time)
+        if self.Hit is True:
+            return
+        # wander
+        if self._shape._x <= self._area[0] and self._dx < 0:
+            self._dx *= -1
+        elif self._shape._x >= self._area[2] and self._dx > 0:
+            self._dx *= -1
+        elif self._shape._y <= self._area[1] and self._dy < 0:
+            self._dy *= -1
+        elif self._shape._y >= self._area[3] and self._dy > 0:
+            self._dy *= -1
         else:
-            # wander
-            if self._shape._x <= self._area[0] and self._dx < 0:
-                self._dx *= -1
-            elif self._shape._x >= self._area[2] and self._dx > 0:
-                self._dx *= -1
-            elif self._shape._y <= self._area[1] and self._dy < 0:
-                self._dy *= -1
-            elif self._shape._y >= self._area[3] and self._dy > 0:
-                self._dy *= -1
-            else:
-                self.move(self._dx, self._dy)
+            self.move(self._dx, self._dy)

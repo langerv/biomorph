@@ -27,8 +27,7 @@ class Npc(Character, GameObject):
         self._hit_time = 0
         self._area = area
         self._hue = 0
-
-        # create rules to transform aptitudes to NPC behaviours
+        # create common rules to transform aptitudes to NPC behaviours
         self.vision_rule = lambda a, b : self.get_aptitude(a).Value * b
         self.speed_rule = lambda a, b : self.get_aptitude(a).Value * b
         self.size_rule = lambda a, b : GameObject.MIN_SHAPE_SIZE + self.get_aptitude(a).Value**b 
@@ -45,10 +44,6 @@ class Npc(Character, GameObject):
         return self._hue
 
     @property
-    def Area(self):
-        return self._area
-
-    @property
     def Hit(self):
         return self._hit
 
@@ -56,12 +51,18 @@ class Npc(Character, GameObject):
     def Hit(self, value):
         self._hit = value
 
-    def hurt(self, hit_points):
-        pass
-
     ''' percepts'''
     def in_area(self, x, y):
         return x >= self._area[0] and x <= self._area[2] and y >= self._area[1] and y <= self._area[3]
+
+    ''' logic '''
+    def update(self, delta_time):
+        if self._hit is True:
+            # if a npc is hit, we compute time before to get it back to life
+            self._hit_time += delta_time
+            if int(self._hit_time) % 60 > Npc.HIT_TIMER:
+                self._hit_time = 0
+                self._hit = False
 
     ''' actions '''
     def look_at(self, x, y):

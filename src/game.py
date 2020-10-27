@@ -15,27 +15,22 @@ from button import ArrowButton, ButtonType
 
 '''
 History
-
 - Create base Arcade client: DONE
 - Add base aptitudes for characaters and biomorph - DONE
-
 - Level1 : morph training
     - spawn various wanderer NPCs and logic for morph - DONE
-
 - Level 2: the guard
     - create obstacles - DONE
     - create guard and basic attack AI - DONE
     - create Life player stat and Game Over screen when dead - DONE
     - create NPCs with psychical aptitudes the guard let pass (NPC + aptitude mask) - DONE
-
 - Level 3: the safe
     - create configurable obstacles - DONE
     - create safe = obstacle with aptitude mask
         - one for intelligence
         - one for speed (laser beam)
     - add hint for players
-
-- other ideas
+- other ideas - TODO
     - make a better distribution of aptitudes among NPCs - TODO
     - add metabolism and energy stat - TODO 
     - add food and eat logic - TODO
@@ -186,6 +181,7 @@ LEVEL_3 = {
     ]
 }
 
+
 '''
 GameView: gameplay screen
 '''
@@ -213,7 +209,7 @@ class GameView(arcade.View):
         self._font_angle_delta = 10
 
     def setup(self, level, next_level=None, prev_level=None):
-        # level
+        # level info
         self._level_name = level['name'] if 'name' in level else ""
         self._background_shape = arcade.ShapeElementList()
         self._level = level
@@ -349,7 +345,6 @@ class GameView(arcade.View):
             self._fps_start_timer = timeit.default_timer()
 
         self._frame_count += 1
-
         if self._frame_count % 20 == 0:
             self._blink = not self._blink
 
@@ -358,16 +353,13 @@ class GameView(arcade.View):
 
         # render map
         self._background_shape.draw()
-
         for map_elt in self._map:
             map_elt.draw()
 
         # draw perception lines between player and perceived shapes
         line_list = arcade.ShapeElementList()
-
         if self._player_hint is not None:
             (map_elt, x, y) = self._player_hint
-
             line_list.append(arcade.create_line(
                 self._player.X, 
                 self._player.Y,
@@ -375,7 +367,6 @@ class GameView(arcade.View):
                 y,
                 map_elt.get_color(),
                 2))
-
             arcade.draw_text(
                 map_elt.get_hint(), 
                 (self._player.X + x)/2, 
@@ -415,7 +406,7 @@ class GameView(arcade.View):
         # game over screen
         # must be done after button check
         if self._game_over is True:
-            
+
             self._font_size += self._font_size_delta
             if self._font_size > 60 or self._font_size < 20:
                 self._font_size_delta *= -1
@@ -489,7 +480,6 @@ class GameView(arcade.View):
 
         # display performance
         if self._perf:
-            # Display timings
             output = f"Processing time: {self._processing_time:.3f}"
             arcade.draw_text(output, 20, SCREEN_HEIGHT - 15, arcade.color.GREEN, 12)
             output = f"Drawing time: {self._draw_time:.3f}"
@@ -517,8 +507,6 @@ class GameView(arcade.View):
         else:
             self._button_hover = None
 
-    '''
-    '''
     def on_mouse_press(self, x, y, button, modifiers):
         if button == arcade.MOUSE_BUTTON_LEFT:
             # check is buttons have been clicked
@@ -601,7 +589,7 @@ class GameView(arcade.View):
                     if hint is not None:
                         closest_hint = (map_elt, x, map_elt.Y)
                     distmin = dy1**2
-                if dy1 > dy2 and dy2**2 < distmin:
+                elif dy1 > dy2 and dy2**2 < distmin:
                     if hint is not None:
                         closest_hint = (map_elt, x, map_elt.Y + map_elt.Height)
                     distmin = dy2**2
@@ -612,7 +600,7 @@ class GameView(arcade.View):
                     if hint is not None:
                         closest_hint = (map_elt, map_elt.X, y)
                     distmin = dx1**2
-                if dx1 > dx2 and dx2**2 < distmin:
+                elif dx1 > dx2 and dx2**2 < distmin:
                     if hint is not None:
                         closest_hint = (map_elt, map_elt.X + map_elt.Width, y)
                     distmin = dx2**2
@@ -655,11 +643,9 @@ class MenuView(arcade.View):
     
     def on_update(self, delta_time):
         self._count_frame += 1
-
         self._title_color[3] = self._title_color[3] + self._alpha_delta
         if self._title_color[3] > 255:
             self._title_color[3] = 255
-
         if self._title_color[3] > 100 and self._count_frame % 20 == 0:
             self._blink = not self._blink
 
@@ -697,6 +683,7 @@ class MenuView(arcade.View):
         start_view.setup(LEVEL_1, LEVEL_2)
         self.window.show_view(start_view)
 
+
 '''
 main function: initialize and start the game screens
 '''
@@ -706,7 +693,7 @@ def main():
     window.show_view(menu_view)
     window.set_update_rate(1/40)
     arcade.run()
- 
+
 
 if __name__ == "__main__":
     main()
