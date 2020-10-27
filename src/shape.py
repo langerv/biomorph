@@ -1,5 +1,10 @@
 import arcade 
 
+
+'''
+Base class for shapes
+'''
+
 class Shape():
     def __init__(self, x, y, angle, width, height, color):
         self._x = x
@@ -16,6 +21,10 @@ class Shape():
         self._shape_list.angle = self._angle
         self._shape_list.draw()
 
+
+'''
+Class for arrow shapes
+'''
 
 class Arrow(Shape):
     def __init__(self, x, y, angle, width, height, color):
@@ -35,6 +44,10 @@ class Arrow(Shape):
             color)
         )
 
+
+'''
+Class for rectangle shapes
+'''
 
 class Rectangle(Shape):
     def __init__(self, x, y, angle, width, height, color, outline=0):
@@ -59,6 +72,9 @@ class Rectangle(Shape):
             )
 
 
+'''
+Class for ellipse shapes
+'''
 
 class Ellipse(Shape):
     def __init__(self, x, y, angle, width, height, color, outline_color=None):
@@ -78,5 +94,3 @@ class Ellipse(Shape):
                 self._height,
                 outline_color)
             )
-
-

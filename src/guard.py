@@ -37,7 +37,7 @@ class Guard(Npc):
         self._vision_threshold_attack = self._vision * 0.7
 
         self._dx = self._dy = self.speed_rule(PhysicalAptitudes.MOVE, 1)
-        self._delta = self.Delta_Speed
+        self._speed = self.Speed
         self._patrol_dx = self._patrol_dy = 0
         if self._width >= self._height:
             self._patrol_dx = self._dx
@@ -119,7 +119,7 @@ class Guard(Npc):
                 self._state = Guard.state.watch
             else:
                 # move towards target
-                if target_dist >= self._delta:
+                if target_dist >= self._speed:
                     self.move_to(target.X, target.Y)
                 else:
                     # hit target: hit points depend on difference of Constitution with minimum of 0.1

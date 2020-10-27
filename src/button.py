@@ -3,11 +3,19 @@ from enum import Enum, auto
 from shape import Arrow
 
 
+'''
+Button types
+'''
+
 class ButtonType(Enum):
     button = auto()
     arrow_left = auto()
     arrow_right = auto()
 
+
+'''
+Base class for buttons
+'''
 
 class Button():
 
@@ -41,6 +49,11 @@ class Button():
     def draw(self):
         self._shape.draw()
  
+
+'''
+Class for Arrows as buttons
+'''
+
 class ArrowButton(Button):
 
     def __init__(self, text, x, y, width, height, type, color, color_hover, color_text=arcade.color.BLACK):

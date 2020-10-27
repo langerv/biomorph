@@ -32,15 +32,13 @@ class Player(Biomorph, GameObject):
         self._morph_target = None
         self._hue = 0
         self._life = life
-
-        # define aptitudes
+       # define player aptitudes
         self.set_aptitude(PhysicalAptitudes.PERC, 1)
         self.set_aptitude(PhysicalAptitudes.MOVE, 1)
         self.set_aptitude(PhysicalAptitudes.CONS, 1)
         self.set_aptitude(PsychicalAptitudes.INTL, 1)
         self.set_aptitude(PsychicalAptitudes.CHAR, 1)
-
-        # define behaviour and shape
+        # define player behaviour and shape
         # create rules to transform aptitudes to behaviours
         self.vision_rule = lambda a, b : self.get_aptitude(a).Value * b
         self.speed_rule = lambda a, b : self.get_aptitude(a).Value # slight advantage for the player here
@@ -49,15 +47,13 @@ class Player(Biomorph, GameObject):
             self._hue, # H
             self.get_aptitude(a).Value / 10, # L max is 0.5
             self.get_aptitude(b).Value / 5) # S max is 1.0
-
         # compute Player attributes
         self._vision = self.vision_rule(PhysicalAptitudes.PERC, 60)
         self._dx = self._dy = self.speed_rule(PhysicalAptitudes.MOVE, 2)
-        self._delta = self.Delta_Speed
+        self._speed = self.Speed
         self._size = self.size_rule(PhysicalAptitudes.CONS, 2)
         self._color = self.color_rule(PsychicalAptitudes.INTL, PsychicalAptitudes.CHAR)
         self._outline_color =arcade.color.BRANDEIS_BLUE
-
         # create shape
         self._shape = Ellipse(x, y, 0, self._size/2, self._size/2, self._color, self._outline_color)
 
@@ -92,15 +88,17 @@ class Player(Biomorph, GameObject):
     def Target(self, target):
         self._morph_target = target
 
+    ''' basic player percepts '''
     def hurt(self, hit_points):
         self._life = max(self._life - hit_points, 0)
 
+    ''' basic player actions '''
     def move_to(self, goal):
         (x, y) = goal
         dx = x - self._shape._x
         dy = y - self._shape._y
         dist = math.sqrt(dx**2+dy**2)
-        if dist >= self._delta:
+        if dist >= self._speed:
             if self.move(self._dx * dx/dist, self._dy * dy/dist) is False:
                 # we collided then stop
                 return True
@@ -121,6 +119,7 @@ class Player(Biomorph, GameObject):
         self._shape._y = new_y
         return True
 
+    ''' player logic '''
     def update(self, delta_time):
         Biomorph.update(self)
 
@@ -129,17 +128,24 @@ class Player(Biomorph, GameObject):
         speed = self.speed_rule(PhysicalAptitudes.MOVE, 2)
         if speed != self._dx or speed != self._dy:
             self._dx = self._dy = speed
-            self._delta = self.Delta_Speed
+            self._speed = self.Speed
         self._size = self.size_rule(PhysicalAptitudes.CONS, 2)
         self._color = self.color_rule(PsychicalAptitudes.INTL, PsychicalAptitudes.CHAR)
-        self._shape = Ellipse(self._shape._x, self._shape._y, 0, self._size/2, self._size/2, self._color, self._outline_color)
+        self._shape = Ellipse(
+            self._shape._x, 
+            self._shape._y, 
+            0, 
+            self._size/2, 
+            self._size/2, 
+            self._color, 
+            self._outline_color)
 
-        # move to Goal if exists
+        # move to goal if player has one 
         if self._goal is not None:
             if self.move_to(self._goal) is True:
                 self._goal = None
 
-        # morph
+        # morph logic
         if self._morph_target is not None:
             if self._morph_target.Hit is True:
                 if self._morph_target.is_inside(self._shape._x, self._shape._y):

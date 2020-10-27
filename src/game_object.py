@@ -3,7 +3,14 @@ import math
 import colorsys
 
 '''
-GameObject class
+Base class for game objects
+properties
+- position
+- angle 
+- speed
+- shape to draw
+- size 
+- color
 '''
 
 class GameObject(abc.ABC):
@@ -27,7 +34,7 @@ class GameObject(abc.ABC):
         return self._shape._y
 
     @property
-    def Delta_Speed(self):
+    def Speed(self):
         return math.sqrt(self._dx**2 + self._dy**2)
 
     @property
@@ -36,7 +43,7 @@ class GameObject(abc.ABC):
 
     @property
     def Color(self):
-        return self._shape._color if self._shape is not None else None
+        return self._shape._color
 
     def HLS_to_Color(self, h, l,s):
         (r, g, b) = colorsys.hls_to_rgb(h, l, s)
