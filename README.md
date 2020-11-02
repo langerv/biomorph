@@ -7,7 +7,7 @@ Install Arcade:
 pip3 install arcade==2.1.3
 ```
 
-then launch the game, that's it!
+clone this repo then launch the game, that's it!
 ```
 python game.py
 ```
