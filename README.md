@@ -2,7 +2,7 @@
 A little game to test ideas about metamorphosis and RPG
 
 ## Installation
-Game
+Install Arcade:
 ```
 pip3 install arcade==2.1.3
 ```
