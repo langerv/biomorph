@@ -14,15 +14,18 @@ python game.py
 
 To run aptitude_unittest.py please install additional packages:
 ```
-pip3 install numpy
-pip3 install matplotlib
+pip install numpy
+pip install matplotlib
 ```
 
-## Level 1
+## How to play?
+The game includes 3 levels:
+
+### Level 1
 ![](images/biomorph_level1.PNG)
 
-## Level 2
+### Level 2
 ![](images/biomorph_level2.PNG)
 
-## Level 3
+### Level 3
 ![](images/biomorph_level3.PNG)
