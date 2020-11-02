@@ -2,17 +2,18 @@
 A little game to test ideas about metamorphosis and RPG
 
 ## Installation
-Install Arcade:
+
+1. Install Arcade:
 ```
 pip3 install arcade==2.1.3
 ```
 
-clone this repo then launch the game, that's it!
+2. Clone this repo then launch the game, that's it!
 ```
 python game.py
 ```
 
-To run aptitude_unittest.py please install additional packages:
+3. (Optional) To run aptitude_unittest.py please install additional packages:
 ```
 pip install numpy
 pip install matplotlib
