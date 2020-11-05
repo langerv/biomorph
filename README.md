@@ -20,21 +20,21 @@ pip install matplotlib
 ```
 
 ## How to play?
-You (the little circle at the center of the scene) are a **biomorph**: you can use the mouse and click somewhere or on something to move.
+You (the little circle at the center of the screen) are a **biomorph**: you can use the mouse and click somewhere or on something to move.
 You are surrounded by colorful shapes representing other creatures.
 Once you click on a shape, you can morph by soaking up its characteristics (like color and size). 
 You need to be on the shape to activate a morph.
-You have life points (Life) and when they're going down to zero, you die and the ame is over. 
+You have life points (Life) and when they're going down to zero, you die and the game is over. 
 Each creature including you has **aptitudes** like in RPG games. 
 Morphs change aptitudes and by doing so, you can pass challenges that require a certain level for some aptitudes.
 **Watch out, some of them are physical and others are psychical, and they evolve differently!** (and that means there are different ways to solve the challenges)
 
 Aptitudes are:
-- Physical:
+- Physical (behaviour):
     - Perception (PERC) impacts perception radius,
     - Motion (MOVE) impacts speed,
     - Constitution (CONS) impacts size.
-- Psychical:
+- Psychical (color):
     - Intelligence (INTL) impacts color intensity,
     - Charisma (CHAR) impacts color saturation,
     - Hue is random.
