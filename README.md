@@ -33,14 +33,17 @@ The game includes 3 levels demonstrating different use cases:
 
 ### Level 1 (training)
 This level has no objective except to let you freely try morphs and see how aptitudes evolve. Enjoy!
+
 ![](images/biomorph_level1.PNG)
 
 ### Level 2 (the guard)
 This level has a guard (the big red square) that protects the upper side of the screen. Your mission is to pass the guard and get to that zone in a minimum of time. 
 Good luck!
+
 ![](images/biomorph_level2.PNG)
 
 ### Level 3 (the safe)
 This level has a safe in the middle of the screen and your mission is to get into the safe zone and then exit without dying. 
 Good luck again!
+
 ![](images/biomorph_level3.PNG)
