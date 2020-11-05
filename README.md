@@ -39,7 +39,7 @@ Aptitudes are:
     - Charisma (CHAR) impacts color saturation,
     - Hue is random.
 
-The game includes 3 levels demonstrating different use cases:
+The game includes 3 levels demonstrating different use cases, and you can freely change levels clicking on arrow buttons.
 
 ### Level 1 (training)
 This level has no objective except to let you freely try morphs and see how aptitudes evolve. Enjoy!
