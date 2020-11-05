@@ -29,6 +29,16 @@ Each creature including you has **aptitudes** like in RPG games.
 Morphs change aptitudes and by doing so, you can pass challenges that require a certain level for some aptitudes.
 **Watch out, some of them are physical and others are psychical, and they evolve differently!** (and that means there are different ways to solve the challenges)
 
+Aptitudes are:
+- Physical:
+    - Perception (PERC) impacts perception radius,
+    - Motion (MOVE) impacts speed,
+    - Constitution (CONS) impacts size.
+- Psychical:
+    - Intelligence (INTL) impacts color intensity,
+    - Charisma (CHAR) impacts color saturation,
+    - Hue is random.
+
 The game includes 3 levels demonstrating different use cases:
 
 ### Level 1 (training)
