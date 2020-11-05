@@ -26,6 +26,7 @@ Once you click on a shape, you can morph by soaking up its characteristics (like
 You need to be on the shape to activate a morph.
 You have life points (Life) and when they're going down to zero, you die and the game is over. 
 
+### Aptitudes
 Each creature including you has **aptitudes** like in RPG games. 
 Morphs change aptitudes and by doing so, you can pass challenges that require a certain level for some aptitudes.
 **Watch out, some of them are physical and others are psychical, and they evolve differently!** (and that means there are different ways to solve the challenges)
@@ -40,7 +41,8 @@ Aptitudes are:
     - Charisma (CHAR) impacts color saturation,
     - Hue is random.
 
-The game includes 3 levels demonstrating different use cases, and you can freely change levels clicking on arrow buttons.
+### Use case
+The game includes 3 playable levels demonstrating different use cases, and you can freely change levels clicking on arrow buttons.
 
 ### Level 1 (training)
 This level has no objective except to let you freely try morphs and see how aptitudes evolve. Enjoy!
