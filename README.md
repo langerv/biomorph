@@ -43,7 +43,7 @@ Good luck!
 ![](images/biomorph_level2.PNG)
 
 ### Level 3 (the safe)
-This level has a safe in the middle of the screen and your mission is to get into the safe zone and then exit without dying. 
+This level has a safe in the middle of the screen and your mission is to get into the safe zone and then exit without dying, and in a minimum of time. 
 Good luck again!
 
 ![](images/biomorph_level3.PNG)
