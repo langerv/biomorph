@@ -41,7 +41,7 @@ Aptitudes are:
     - Charisma (CHAR) impacts color saturation,
     - Hue is random.
 
-### Use case
+## Game levels
 The game includes 3 playable levels demonstrating different use cases, and you can freely change levels clicking on arrow buttons.
 
 ### Level 1 (training)
