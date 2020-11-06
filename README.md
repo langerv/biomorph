@@ -42,7 +42,7 @@ Aptitudes are:
     - Hue is random.
 
 ## Game levels
-The game includes 3 playable levels demonstrating different use cases, and you can freely change levels clicking on arrow buttons.
+The game includes 3 playable levels demonstrating different use cases, and you can freely change levels clicking on orange arrow buttons a the top of the screen.
 
 ### Level 1 (training)
 This level has no objective except to let you freely try morphs and see how aptitudes evolve. Enjoy!
