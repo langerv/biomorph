@@ -101,7 +101,9 @@ class Biomorph(Character):
                     Biomorph.PSY_KA)
 
         # recompute morph cost
-        self._morph_cost = Biomorph.MORPH_COST_ENERGY / math.sqrt(len(self._aptitudes) * 25)
+        self._morph_cost = Biomorph.MORPH_COST_ENERGY / math.sqrt(
+            len(self._aptitudes) * 25
+        )
 
     def morph_cost(self, morph_target):
         sum = 0
